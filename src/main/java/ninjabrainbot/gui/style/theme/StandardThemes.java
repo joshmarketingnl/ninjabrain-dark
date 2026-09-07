@@ -95,6 +95,46 @@ class InvertedTheme extends Theme {
 	}
 }
 
+class OriginalDarkTheme extends Theme {
+
+	public static final int UID = 12;
+
+	public OriginalDarkTheme() {
+		super("Original dark", UID);
+	}
+
+	@Override
+	protected void loadTheme() {
+		loaded = true;
+
+		// Josh's own custom theme from the original Ninjabrain Bot, colour for colour.
+		COLOR_STRONGEST = createColor(Color.decode("#121212"));
+		COLOR_STRONG = createColor(Color.decode("#1D2228"));
+		COLOR_SLIGHTLY_STRONG = createColor(Color.decode("#262B31"));
+		COLOR_SLIGHTLY_WEAK = createColor(Color.decode("#121212"));
+		COLOR_NEUTRAL = createColor(Color.decode("#121212"));
+		COLOR_DIVIDER = createColor(Color.decode("#444444"));
+		COLOR_DIVIDER_DARK = createColor(Color.decode("#383838"));
+		COLOR_EXIT_BUTTON_HOVER = createColor(Color.decode("#F04747"));
+		TEXT_COLOR_SLIGHTLY_WEAK = createColor(Color.decode("#FFFFFF"));
+		TEXT_COLOR_TITLE = createColor(Color.decode("#FFFFFF"));
+		TEXT_COLOR_NEUTRAL = createColor(Color.decode("#DCDCDC"));
+		TEXT_COLOR_SLIGHTLY_STRONG = createColor(Color.decode("#C3C3C3"));
+		// His own value here was near white, which makes captions shout as loud as the numbers.
+		TEXT_COLOR_WEAK = createColor(Color.decode("#8F8F8F"));
+		TEXT_COLOR_HEADER = createColor(Color.decode("#E5E5E5"));
+		COLOR_SATURATED = createColor(Color.decode("#57EBA3"));
+		COLOR_POSITIVE = createColor(Color.decode("#16EA00"));
+		COLOR_NEGATIVE = createColor(Color.decode("#F27E83"));
+
+		// His gradient was green at the top and grey for the rest, so nothing in between could be
+		// read at a glance. Same green, but with a real amber and red under it.
+		COLOR_GRADIENT_100 = createColor(Color.decode("#3EFF00"));
+		COLOR_GRADIENT_50 = createColor(Color.decode("#FFB020"));
+		COLOR_GRADIENT_0 = createColor(Color.decode("#FF4B4B"));
+	}
+}
+
 class DarkTheme extends Theme {
 
 	public static final int UID = 1;

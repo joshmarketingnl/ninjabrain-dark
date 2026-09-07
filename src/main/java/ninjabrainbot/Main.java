@@ -19,9 +19,22 @@ public class Main {
 
 	public static final String VERSION = "1.5.2";
 
-	/** Fork identity. Kept separate from the original Ninjabrain Bot so both can be installed side by side. */
-	public static final String APP_NAME = "Ninjabrain Light";
-	public static final String PREFERENCES_NODE = "ninjabrainbot_light";
+	/**
+	 * Fork identity. One jar serves two apps: the shortcut passes
+	 * {@code -Dninjabrain.edition=dark} for the dark one. Everything that could collide with the
+	 * other edition, or with the original Ninjabrain Bot, is derived from this.
+	 */
+	public static final boolean DARK_EDITION = "dark".equalsIgnoreCase(System.getProperty("ninjabrain.edition", "light"));
+
+	public static final String APP_NAME = DARK_EDITION ? "Ninjabrain Dark" : "Ninjabrain Light";
+	public static final String PREFERENCES_NODE = DARK_EDITION ? "ninjabrainbot_dark" : "ninjabrainbot_light";
+	public static final String SAVE_STATE_FILE = DARK_EDITION ? "NinjabrainDark-save-state.txt" : "NinjabrainLight-save-state.txt";
+	public static final String OVERLAY_FILE = DARK_EDITION ? "nb-dark-overlay.png" : "nb-light-overlay.png";
+	public static final String ICON = DARK_EDITION ? "/icon_dark.png" : "/icon.png";
+	public static final int HTTP_PORT = DARK_EDITION ? 52535 : 52534;
+
+	/** UID of the theme this edition starts with, see StandardThemes. */
+	public static final int DEFAULT_THEME_UID = DARK_EDITION ? 12 : 11;
 
 	public static void main(String[] args) {
 		ErrorHandler errorHandler = new ErrorHandler();
@@ -51,7 +64,7 @@ public class Main {
 		Profiler.stopAndStart("Register keyboard listener");
 		KeyboardListener.preInit();
 
-		System.setProperty("apple.awt.application.name", "NinjabrainLight");
+		System.setProperty("apple.awt.application.name", APP_NAME.replace(" ", ""));
 		Progress.startCompoundTask("", 1f);
 		Profiler.stopAndStart("Initialize GUI");
 		Locale.setDefault(Locale.US);

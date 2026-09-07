@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import ninjabrainbot.Main;
 import ninjabrainbot.event.DisposeHandler;
 import ninjabrainbot.event.ISubscribable;
 import ninjabrainbot.event.ObservableField;
@@ -56,8 +57,11 @@ public abstract class Theme {
 	private static int nextCustomThemeUID = -1;
 
 	public static void loadThemes(NinjabrainBotPreferences preferences) {
-		defaultTheme = new InvertedTheme();
-		addStandardTheme(defaultTheme);
+		Theme inverted = new InvertedTheme();
+		Theme originalDark = new OriginalDarkTheme();
+		defaultTheme = Main.DEFAULT_THEME_UID == OriginalDarkTheme.UID ? originalDark : inverted;
+		addStandardTheme(inverted);
+		addStandardTheme(originalDark);
 		addStandardTheme(new DarkTheme());
 		addStandardTheme(new LightTheme());
 		addStandardTheme(new BlueTheme());

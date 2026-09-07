@@ -91,7 +91,7 @@ public class NinjabrainBotPreferences {
 		// Integer
 		windowX = new IntPreference("window_x", 100, source);
 		windowY = new IntPreference("window_y", 100, source);
-		theme = new IntPreference("theme", 11, source);
+		theme = new IntPreference("theme", ninjabrainbot.Main.DEFAULT_THEME_UID, source);
 		settingsVersion = new IntPreference("settings_version", 0, source);
 		// Hotkey
 		hotkeyIncrement = new HotkeyPreference("hotkey_increment", source);

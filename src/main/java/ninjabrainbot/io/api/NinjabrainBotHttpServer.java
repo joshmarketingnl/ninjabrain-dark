@@ -40,7 +40,7 @@ public class NinjabrainBotHttpServer implements IDisposable {
 	private void updateHttpServerStatus() {
 		if (preferences.enableHttpServer.get()) {
 			if (httpServer == null)
-				startHttpServer(52534);
+				startHttpServer(ninjabrainbot.Main.HTTP_PORT);
 		} else {
 			if (httpServer != null)
 				stopHttpServer();

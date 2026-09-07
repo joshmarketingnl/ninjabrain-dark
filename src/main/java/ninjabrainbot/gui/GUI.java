@@ -1,6 +1,7 @@
 package ninjabrainbot.gui;
 
 import ninjabrainbot.event.DisposeHandler;
+import ninjabrainbot.Main;
 import ninjabrainbot.gui.frames.NinjabrainBotFrame;
 import ninjabrainbot.gui.frames.OptionsFrame;
 import ninjabrainbot.gui.splash.Progress;
@@ -104,7 +105,7 @@ public class GUI {
 		actionExecutor = modelState.actionExecutor;
 		environmentState = modelState.environmentState;
 		dataState = modelState.dataState;
-		domainModelImportExportService = new DomainModelImportExportService(domainModel, new TempFileAccessor("NinjabrainLight-save-state.txt"), preferences);
+		domainModelImportExportService = new DomainModelImportExportService(domainModel, new TempFileAccessor(Main.SAVE_STATE_FILE), preferences);
 		domainModelImportExportService.triggerDeserialization();
 		domainModel.deleteHistory();
 		Profiler.stop();

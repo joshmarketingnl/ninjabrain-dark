@@ -270,7 +270,7 @@ public class NinjabrainBotFrame extends ThemedFrame implements IDisposable {
 	}
 
 	private void setAppIcon() {
-		URL iconURL = Main.class.getResource("/icon.png");
+		URL iconURL = Main.class.getResource(Main.ICON);
 		ImageIcon img = new ImageIcon(Objects.requireNonNull(iconURL));
 		setIconImage(img.getImage());
 

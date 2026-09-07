@@ -6,7 +6,7 @@
     <artifactId>ninjabrainbot</artifactId>
     <packaging>jar</packaging>
     <version>1.5.2</version>
-    <name>Ninjabrain Light</name>
+    <name>Ninjabrain Focus</name>
     <description>An accurate stronghold calculator for Minecraft speedrunning.</description>
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
@@ -28,7 +28,7 @@
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
-                    <finalName>Ninjabrain-Light-1.5.2</finalName>
+                    <finalName>Ninjabrain-Focus-1.5.2</finalName>
                     <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
             </plugin>
