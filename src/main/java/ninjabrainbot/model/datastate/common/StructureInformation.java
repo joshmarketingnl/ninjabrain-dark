@@ -68,18 +68,22 @@ public class StructureInformation implements IOverworldPosition, IDisposable {
 	}
 
 	/**
-	 * Colour for how far off the travel angle is, over the whole 0-180 range.
+	 * Colour for how far off the travel angle is.
 	 * <p>
-	 * Upstream divides by 180 linearly, which puts everything under 20 degrees in the same shade of
-	 * green, exactly where the reading matters. Clamping the range instead makes everything past
-	 * that one flat red, which is just as useless when you are sweeping around looking for the
-	 * direction. A power curve keeps fine detail near zero and still changes colour all the way to
-	 * 180: roughly amber at 30 degrees, orange at 60, deep red only when facing away.
+	 * Upstream divides by 180 linearly, so everything under 20 degrees comes out the same green,
+	 * exactly where the reading matters. Clamping the range instead makes everything past it one
+	 * flat red, just as useless while sweeping around for the direction. So: green while you are
+	 * within {@link #TRAVEL_ANGLE_GREEN_DEGREES} of the target, and from there a curve that still
+	 * changes colour all the way out to 180.
 	 */
-	private static final double TRAVEL_ANGLE_COLOR_EXPONENT = 0.4;
+	private static final double TRAVEL_ANGLE_GREEN_DEGREES = 10.0;
+	private static final double TRAVEL_ANGLE_COLOR_EXPONENT = 0.45;
 
 	public float getTravelAngleDiffColor() {
-		double fraction = Math.min(1.0, Math.abs(travelAngleDifference) / 180.0);
+		double off = Math.abs(travelAngleDifference) - TRAVEL_ANGLE_GREEN_DEGREES;
+		if (off <= 0)
+			return 1;
+		double fraction = Math.min(1.0, off / (180.0 - TRAVEL_ANGLE_GREEN_DEGREES));
 		return (float) (1 - Math.pow(fraction, TRAVEL_ANGLE_COLOR_EXPONENT));
 	}
 
