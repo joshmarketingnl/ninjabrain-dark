@@ -45,6 +45,19 @@ public class ThemedTabbedPane extends ThemedPanel {
 		tabPanel.add(tabButton);
 	}
 
+	public int getTabCount() {
+		return tabs.size();
+	}
+
+	public java.awt.Component getTabComponent(int index) {
+		return index >= 0 && index < tabs.size() ? tabs.get(index).component : null;
+	}
+
+	public void setSelectedIndex(int index) {
+		if (index >= 0 && index < tabs.size())
+			setVisible(tabs.get(index));
+	}
+
 	void setVisible(TabButton tab) {
 		for (TabButton t : tabs) {
 			t.setComponentVisible(tab == t);

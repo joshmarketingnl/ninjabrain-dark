@@ -55,6 +55,7 @@ public class FocusTriangulationPanel extends ThemedPanel implements IDisposable 
 	private final FocusCell netherCell;
 	private final FocusCell angleCell;
 
+	private final java.util.HashMap<String, ThemedPanel> rowCache = new java.util.HashMap<>();
 	private FocusLayoutType currentLayout;
 	private ChunkPrediction currentPrediction;
 	private Subscription predictionSubscription;
@@ -106,6 +107,8 @@ public class FocusTriangulationPanel extends ThemedPanel implements IDisposable 
 	private void rebuild() {
 		currentLayout = selectedLayout();
 		removeAll();
+		for (ThemedPanel cachedRow : rowCache.values())
+			cachedRow.removeAll();
 		int gap = styleManager.size.PADDING;
 		// Equal rows, so a value can never be clipped by the row below it.
 		setLayout(new GridLayout(rowCount(), 1, 0, styleManager.size.PADDING_THIN));
@@ -148,7 +151,21 @@ public class FocusTriangulationPanel extends ThemedPanel implements IDisposable 
 		repaint();
 	}
 
+	/**
+	 * Rows are cached by their contents. Creating a ThemedPanel registers it with the StyleManager,
+	 * and doing that while the StyleManager is updating every component crashes the layout pass.
+	 */
 	private ThemedPanel row(int gap, FocusCell[] rowCells, float[] weights) {
+		StringBuilder key = new StringBuilder();
+		for (FocusCell cell : rowCells)
+			key.append(System.identityHashCode(cell)).append(',');
+		ThemedPanel cached = rowCache.get(key.toString());
+		if (cached != null) {
+			for (FocusCell cell : rowCells)
+				cached.add(cell);
+			return cached;
+		}
+
 		ThemedPanel panel = new ThemedPanel(styleManager);
 		ColumnLayout columnLayout = new ColumnLayout(gap);
 		panel.setLayout(columnLayout);
@@ -158,6 +175,7 @@ public class FocusTriangulationPanel extends ThemedPanel implements IDisposable 
 			columnLayout.setRelativeWidth(rowCells[i], weights[i]);
 			panel.add(rowCells[i]);
 		}
+		rowCache.put(key.toString(), panel);
 		return panel;
 	}
 

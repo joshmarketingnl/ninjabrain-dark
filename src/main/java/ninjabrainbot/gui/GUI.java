@@ -145,6 +145,17 @@ public class GUI {
 		Profiler.stopAndStart("Create settings window");
 		ninjabrainBotFrame.getSettingsButton().addActionListener(__ -> getOrCreateOptionsFrame().toggleWindow(ninjabrainBotFrame));
 
+		// -Dninjabrain.debug.openSettings=<tabIndex> opens the settings window at startup, so the
+		// panels can be inspected without driving the mouse.
+		String debugTab = System.getProperty("ninjabrain.debug.openSettings");
+		if (debugTab != null) {
+			javax.swing.SwingUtilities.invokeLater(() -> {
+				OptionsFrame options = getOrCreateOptionsFrame();
+				options.toggleWindow(ninjabrainBotFrame);
+				options.selectTab(debugTab);
+			});
+		}
+
 		Progress.setTask("Settings fonts and colors", 0.99f);
 		Profiler.stopAndStart("Init fonts, colors, bounds");
 		styleManager.init();

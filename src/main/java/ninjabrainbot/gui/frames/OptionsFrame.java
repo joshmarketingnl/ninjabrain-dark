@@ -76,6 +76,20 @@ public class OptionsFrame extends ThemedFrame {
 		}
 	}
 
+	/** "3" selects a tab, "6.3" also selects a sub tab inside it. */
+	public void selectTab(String path) {
+		String[] parts = path.split(java.util.regex.Pattern.quote("."));
+		int index = Integer.parseInt(parts[0]);
+		if (index < 0 || index >= tabbedPane.getTabCount())
+			return;
+		tabbedPane.setSelectedIndex(index);
+		if (parts.length > 1) {
+			java.awt.Component tab = tabbedPane.getTabComponent(index);
+			if (tab instanceof ThemedTabbedPane)
+				((ThemedTabbedPane) tab).setSelectedIndex(Integer.parseInt(parts[1]));
+		}
+	}
+
 	public void toggleWindow(JFrame parent) {
 		if (isVisible()) {
 			close();

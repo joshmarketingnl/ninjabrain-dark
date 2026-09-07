@@ -122,7 +122,7 @@ public class NinjabrainBotPreferences {
 		checkForUpdates = new BooleanPreference("check_for_updates", true, source);
 		translucent = new BooleanPreference("translucent", false, source);
 		blurredBackground = new BooleanPreference("blurred_background", false, source);
-		showThrowCoordinates = new BooleanPreference("show_throw_coordinates", true, source);
+		showThrowCoordinates = new BooleanPreference("show_throw_coordinates", false, source);
 		windowOpacity = new FloatPreference("window_opacity", 75f, 20f, 100f, source);
 		focusTextScale = new FloatPreference("focus_text_scale", 190f, 100f, 300f, source);
 		focusLayout = new MultipleChoicePreference<>("focus_layout", FocusLayoutType.GRID, new int[] { 0, 1, 2 }, new FocusLayoutType[] { FocusLayoutType.ROW, FocusLayoutType.GRID, FocusLayoutType.STACKED }, source);

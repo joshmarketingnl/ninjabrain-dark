@@ -90,25 +90,27 @@ public class StyleManager {
 	}
 
 	private void updateBounds() {
-		for (ThemedComponent tc : themedComponents) {
+		// Copies, because updating a component can register another one and that would otherwise
+		// throw a ConcurrentModificationException in the middle of laying out the window.
+		for (ThemedComponent tc : new ArrayList<>(themedComponents)) {
 			tc.updateSize(this);
 		}
-		for (ThemedFrame tf : themedFrames) {
+		for (ThemedFrame tf : new ArrayList<>(themedFrames)) {
 			tf.updateBounds(this);
 		}
-		for (ThemedDialog tf : themedDialogs) {
+		for (ThemedDialog tf : new ArrayList<>(themedDialogs)) {
 			tf.updateBounds(this);
 		}
 	}
 
 	public void updateFontsAndColors() {
-		for (ThemedFrame tf : themedFrames) {
+		for (ThemedFrame tf : new ArrayList<>(themedFrames)) {
 			tf.updateFontsAndColors();
 		}
-		for (ThemedDialog tf : themedDialogs) {
+		for (ThemedDialog tf : new ArrayList<>(themedDialogs)) {
 			tf.updateFontsAndColors();
 		}
-		for (ThemedComponent tc : themedComponents) {
+		for (ThemedComponent tc : new ArrayList<>(themedComponents)) {
 			tc.updateColors();
 			tc.updateSize(this);
 		}
