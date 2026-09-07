@@ -26,8 +26,21 @@ public class ClipboardReader implements IClipboardProvider, Runnable {
 		this.preferences = preferences;
 		clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 		clipboardString = new ObservableField<>(null, true);
-		lastClipboardString = "";
+		// Whatever is on the clipboard right now is left over from before this app started, most
+		// likely an F3+C from an earlier session. Upstream starts with an empty value and so takes
+		// it for a fresh measurement, which silently poisons the first triangulation after every
+		// launch. Only changes made from here on count as a new throw.
+		lastClipboardString = readClipboardQuietly();
 		forceReadLater = new AtomicBoolean(false);
+	}
+
+	private String readClipboardQuietly() {
+		try {
+			String contents = (String) clipboard.getData(DataFlavor.stringFlavor);
+			return contents == null ? "" : contents;
+		} catch (UnsupportedFlavorException | IOException | RuntimeException ignored) {
+			return "";
+		}
 	}
 
 	public IObservable<String> clipboardText() {
