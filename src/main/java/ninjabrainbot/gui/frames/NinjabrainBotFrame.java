@@ -39,7 +39,6 @@ import ninjabrainbot.io.preferences.enums.FocusLayoutType;
 import ninjabrainbot.io.preferences.enums.MainViewType;
 import ninjabrainbot.io.updatechecker.IUpdateChecker;
 import ninjabrainbot.model.datastate.IDataState;
-import ninjabrainbot.model.datastate.common.ResultType;
 import ninjabrainbot.model.information.InformationMessageList;
 import ninjabrainbot.model.input.IButtonInputHandler;
 import ninjabrainbot.util.I18n;
@@ -48,7 +47,6 @@ import ninjabrainbot.util.Profiler;
 public class NinjabrainBotFrame extends ThemedFrame implements IDisposable {
 
 	private final NinjabrainBotPreferences preferences;
-	private final IDataState dataState;
 
 	/** The eye throw table below still needs some room, however narrow the focus layout gets. */
 	private static final int MIN_FOCUS_WIDTH = 280;
@@ -72,7 +70,6 @@ public class NinjabrainBotFrame extends ThemedFrame implements IDisposable {
 	public NinjabrainBotFrame(StyleManager styleManager, NinjabrainBotPreferences preferences, IUpdateChecker updateChecker, IDataState dataState, IButtonInputHandler buttonInputHandler, InformationMessageList informationMessageList) {
 		super(styleManager, preferences, TITLE_TEXT, true);
 		this.preferences = preferences;
-		this.dataState = dataState;
 		this.styleManager = styleManager;
 		Profiler.start("NinjabrainBotFrame");
 		setLocation(preferences.windowX.get(), preferences.windowY.get()); // Set window position
@@ -228,8 +225,9 @@ public class NinjabrainBotFrame extends ThemedFrame implements IDisposable {
 	 */
 	private int getExtraWidth(StyleManager styleManager) {
 		MainViewType view = preferences.view.get();
-		// Only the triangulation card is enlarged; blind and divine keep the normal window width.
-		if (view.equals(MainViewType.FOCUS) && dataState.resultType().get() == ResultType.TRIANGULATION)
+		// The focus view keeps the width its layout will eventually need, also while idle. Growing
+		// only once the first measurement lands makes the window jump out from under the player.
+		if (view.equals(MainViewType.FOCUS))
 			return Math.max(MIN_FOCUS_WIDTH, FocusTriangulationPanel.preferredWindowWidth(styleManager, preferences)) - styleManager.size.WIDTH;
 		if (preferences.showAngleUpdates.get() && view.equals(MainViewType.DETAILED))
 			return styleManager.size.ANGLE_COLUMN_WIDTH;
