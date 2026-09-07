@@ -9,7 +9,7 @@ public class SavedPreferences implements IPreferenceSource {
 	final Preferences pref;
 
 	public SavedPreferences() {
-		pref = Preferences.userNodeForPackage(Main.class);
+		pref = Preferences.userRoot().node(Main.PREFERENCES_NODE);
 	}
 
 	@Override

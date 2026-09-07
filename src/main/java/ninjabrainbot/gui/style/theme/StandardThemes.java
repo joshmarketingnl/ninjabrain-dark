@@ -59,6 +59,42 @@ public class StandardThemes {
 
 }
 
+class InvertedTheme extends Theme {
+
+	public static final int UID = 11;
+
+	public InvertedTheme() {
+		super("Inverted", UID);
+	}
+
+	@Override
+	protected void loadTheme() {
+		loaded = true;
+
+		COLOR_NEUTRAL = createColor(Color.decode("#F6F6FB"));
+		COLOR_STRONGEST = createColor(Color.decode("#E4E4EF"));
+		COLOR_EXIT_BUTTON_HOVER = createColor(Color.decode("#F04747"));
+		COLOR_DIVIDER = createColor(Color.decode("#D9D9E6"));
+		COLOR_DIVIDER_DARK = createColor(Color.decode("#C6C6D6"));
+		COLOR_SLIGHTLY_STRONG = createColor(Color.decode("#ECECF4"));
+		COLOR_SLIGHTLY_WEAK = createColor(Color.decode("#FAFAFD"));
+		COLOR_STRONG = createColor(Color.decode("#E9E9F2"));
+		TEXT_COLOR_SLIGHTLY_WEAK = createColor(Color.decode("#16161F"));
+		TEXT_COLOR_SLIGHTLY_STRONG = createColor(Color.decode("#22222E"));
+		TEXT_COLOR_WEAK = createColor(Color.decode("#8A8A9A"));
+		TEXT_COLOR_NEUTRAL = createColor(Color.decode("#3A3A4A"));
+		TEXT_COLOR_HEADER = createColor(Color.decode("#22222E"));
+		TEXT_COLOR_TITLE = createColor(Color.decode("#1C1C27"));
+		COLOR_SATURATED = createColor(Color.decode("#2F6FED"));
+		COLOR_POSITIVE = createColor(Color.decode("#1F8B34"));
+		COLOR_NEGATIVE = createColor(Color.decode("#C0392B"));
+
+		COLOR_GRADIENT_0 = createColor(Color.decode("#C62828"));
+		COLOR_GRADIENT_50 = createColor(Color.decode("#B8860B"));
+		COLOR_GRADIENT_100 = createColor(Color.decode("#128C2A"));
+	}
+}
+
 class DarkTheme extends Theme {
 
 	public static final int UID = 1;

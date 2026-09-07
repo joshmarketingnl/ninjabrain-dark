@@ -9,6 +9,7 @@ import ninjabrainbot.event.DisposeHandler;
 import ninjabrainbot.event.IDisposable;
 import ninjabrainbot.event.IObservable;
 import ninjabrainbot.gui.frames.NinjabrainBotFrame;
+import ninjabrainbot.gui.style.Translucency;
 import ninjabrainbot.io.preferences.NinjabrainBotPreferences;
 import ninjabrainbot.model.datastate.IDataState;
 import ninjabrainbot.model.domainmodel.IDomainModel;
@@ -119,7 +120,12 @@ public class OBSOverlay implements IDisposable {
 			BufferedImage img = new BufferedImage(ninjabrainBotFrame.getWidth(), ninjabrainBotFrame.getHeight(), BufferedImage.TYPE_INT_ARGB);
 			boolean hideBecauseLocked = preferences.overlayHideWhenLocked.get() && calculatorLocked.get();
 			if (!ninjabrainBotFrame.isIdle() && !hideBecauseLocked) {
-				ninjabrainBotFrame.paint(img.createGraphics());
+				Translucency.suspend(true);
+				try {
+					ninjabrainBotFrame.paint(img.createGraphics());
+				} finally {
+					Translucency.suspend(false);
+				}
 				resetClearTimer();
 			}
 			imageWriter.write(img);

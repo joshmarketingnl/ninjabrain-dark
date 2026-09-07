@@ -1,11 +1,13 @@
 package ninjabrainbot.gui.frames;
 
+import java.awt.Color;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.net.URL;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 
 import ninjabrainbot.Main;
@@ -18,6 +20,7 @@ import ninjabrainbot.gui.components.labels.ThemedLabel;
 import ninjabrainbot.gui.components.panels.TitleBarPanel;
 import ninjabrainbot.gui.style.SizePreference;
 import ninjabrainbot.gui.style.StyleManager;
+import ninjabrainbot.gui.style.Translucency;
 import ninjabrainbot.gui.style.theme.WrappedColor;
 import ninjabrainbot.io.preferences.NinjabrainBotPreferences;
 
@@ -31,12 +34,22 @@ public abstract class ThemedFrame extends JFrame implements IDisposable {
 	protected final DisposeHandler disposeHandler = new DisposeHandler();
 	private final StyleManager styleManager;
 
+	/** Only the main window gets a frosted glass content pane, other windows stay plain. */
+	protected final GlassBackdrop glassBackdrop;
+
 	public ThemedFrame(StyleManager styleManager, NinjabrainBotPreferences preferences, String title) {
+		this(styleManager, preferences, title, false);
+	}
+
+	public ThemedFrame(StyleManager styleManager, NinjabrainBotPreferences preferences, String title, boolean useGlassBackdrop) {
 		super(title);
 		this.styleManager = styleManager;
 		styleManager.registerThemedFrame(this);
 		setUndecorated(true); // Remove borders
 		setAlwaysOnTop(preferences.alwaysOnTop.get()); // Always focused
+		glassBackdrop = useGlassBackdrop ? new GlassBackdrop(this) : null;
+		if (glassBackdrop != null)
+			setContentPane(glassBackdrop);
 		setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 		titlebarPanel = new TitleBarPanel(styleManager, this);
 		add(titlebarPanel);
@@ -76,8 +89,14 @@ public abstract class ThemedFrame extends JFrame implements IDisposable {
 	}
 
 	public void updateFontsAndColors() {
-		getContentPane().setBackground(bgCol.color());
-		setBackground(bgCol.color());
+		Color bg = bgCol.color();
+		boolean translucent = Translucency.appliesTo(getContentPane());
+		if (getContentPane() instanceof JComponent)
+			((JComponent) getContentPane()).setOpaque(!translucent);
+		getContentPane().setBackground(bg);
+		// A see-through window needs a per-pixel transparent frame background, the panels on top
+		// supply the actual tint.
+		setBackground(translucent ? new Color(bg.getRed(), bg.getGreen(), bg.getBlue(), 0) : bg);
 	}
 
 	public void checkIfOffScreen() {
@@ -93,6 +112,8 @@ public abstract class ThemedFrame extends JFrame implements IDisposable {
 	@Override
 	public void dispose() {
 		super.dispose();
+		if (glassBackdrop != null)
+			glassBackdrop.dispose();
 		disposeHandler.dispose();
 	}
 

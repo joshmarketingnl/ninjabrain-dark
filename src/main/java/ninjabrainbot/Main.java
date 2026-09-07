@@ -19,6 +19,10 @@ public class Main {
 
 	public static final String VERSION = "1.5.2";
 
+	/** Fork identity. Kept separate from the original Ninjabrain Bot so both can be installed side by side. */
+	public static final String APP_NAME = "Ninjabrain Light";
+	public static final String PREFERENCES_NODE = "ninjabrainbot_light";
+
 	public static void main(String[] args) {
 		ErrorHandler errorHandler = new ErrorHandler();
 		try {
@@ -47,7 +51,7 @@ public class Main {
 		Profiler.stopAndStart("Register keyboard listener");
 		KeyboardListener.preInit();
 
-		System.setProperty("apple.awt.application.name", "NinjabrainBot");
+		System.setProperty("apple.awt.application.name", "NinjabrainLight");
 		Progress.startCompoundTask("", 1f);
 		Profiler.stopAndStart("Initialize GUI");
 		Locale.setDefault(Locale.US);

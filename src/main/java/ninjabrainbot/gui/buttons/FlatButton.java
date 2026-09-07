@@ -13,6 +13,7 @@ import javax.swing.border.EmptyBorder;
 import ninjabrainbot.gui.components.ThemedComponent;
 import ninjabrainbot.gui.style.SizePreference;
 import ninjabrainbot.gui.style.StyleManager;
+import ninjabrainbot.gui.style.Translucency;
 import ninjabrainbot.gui.style.theme.WrappedColor;
 
 /**
@@ -48,11 +49,11 @@ public class FlatButton extends JButton implements ThemedComponent {
 		setCursor(new Cursor(Cursor.HAND_CURSOR));
 		addMouseListener(new java.awt.event.MouseAdapter() {
 			public void mouseEntered(java.awt.event.MouseEvent evt) {
-				setBackground(isEnabled() ? hoverCol : bgCol);
+				setBackground(Translucency.apply(isEnabled() ? hoverCol : bgCol, FlatButton.this));
 			}
 
 			public void mouseExited(java.awt.event.MouseEvent evt) {
-				setBackground(bgCol);
+				setBackground(Translucency.apply(bgCol, FlatButton.this));
 			}
 		});
 		styleManager.registerThemedComponent(this);
@@ -83,12 +84,12 @@ public class FlatButton extends JButton implements ThemedComponent {
 		// Change color on hover
 		addMouseListener(new java.awt.event.MouseAdapter() {
 			public void mouseEntered(java.awt.event.MouseEvent evt) {
-				setBackground(isEnabled() ? hoverCol : bgCol);
+				setBackground(Translucency.apply(isEnabled() ? hoverCol : bgCol, FlatButton.this));
 				setForeground(isEnabled() ? fgHoverCol : fgCol);
 			}
 
 			public void mouseExited(java.awt.event.MouseEvent evt) {
-				setBackground(bgCol);
+				setBackground(Translucency.apply(bgCol, FlatButton.this));
 				setForeground(fgCol);
 			}
 		});
@@ -101,7 +102,8 @@ public class FlatButton extends JButton implements ThemedComponent {
 	}
 
 	private void setColors(final Color backgroundColor, final Color hoverColor, final Color foregroundColor, final Color foregroundHoverColor) {
-		setBackground(backgroundColor);
+		setOpaque(!Translucency.appliesTo(this));
+		setBackground(Translucency.apply(backgroundColor, this));
 		this.bgCol = backgroundColor;
 		this.hoverCol = hoverColor;
 		this.fgCol = foregroundColor;
@@ -109,8 +111,21 @@ public class FlatButton extends JButton implements ThemedComponent {
 	}
 
 	public void setBackgroundColor(final Color backgroundColor) {
-		setBackground(backgroundColor);
+		setBackground(Translucency.apply(backgroundColor, this));
 		this.bgCol = backgroundColor;
+	}
+
+	/** Swing only fills the background of opaque components, so a see-through button paints its own. */
+	@Override
+	protected void paintComponent(Graphics g) {
+		if (!isOpaque()) {
+			Color bg = getBackground();
+			if (bg != null) {
+				g.setColor(Translucency.isSuspended() ? Translucency.opaque(bg) : bg);
+				g.fillRect(0, 0, getWidth(), getHeight());
+			}
+		}
+		super.paintComponent(g);
 	}
 
 	@Override

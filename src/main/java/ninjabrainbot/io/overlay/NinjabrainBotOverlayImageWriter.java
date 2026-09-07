@@ -10,7 +10,7 @@ import ninjabrainbot.util.Logger;
 
 public class NinjabrainBotOverlayImageWriter implements IImageWriter {
 
-	public static final File OBS_OVERLAY = new File(System.getProperty("java.io.tmpdir"), "nb-overlay.png");
+	public static final File OBS_OVERLAY = new File(System.getProperty("java.io.tmpdir"), "nb-light-overlay.png");
 
 	public void write(BufferedImage img) {
 		try {

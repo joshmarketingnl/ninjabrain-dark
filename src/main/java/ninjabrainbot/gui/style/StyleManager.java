@@ -101,7 +101,7 @@ public class StyleManager {
 		}
 	}
 
-	private void updateFontsAndColors() {
+	public void updateFontsAndColors() {
 		for (ThemedFrame tf : themedFrames) {
 			tf.updateFontsAndColors();
 		}

@@ -14,6 +14,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
 
 import com.sun.jna.Platform;
 import ninjabrainbot.Main;
@@ -31,6 +32,7 @@ import ninjabrainbot.gui.mainwindow.main.MainButtonPanel;
 import ninjabrainbot.gui.mainwindow.main.MainTextArea;
 import ninjabrainbot.gui.style.SizePreference;
 import ninjabrainbot.gui.style.StyleManager;
+import ninjabrainbot.gui.style.Translucency;
 import ninjabrainbot.io.preferences.NinjabrainBotPreferences;
 import ninjabrainbot.io.preferences.enums.MainViewType;
 import ninjabrainbot.io.updatechecker.IUpdateChecker;
@@ -52,26 +54,34 @@ public class NinjabrainBotFrame extends ThemedFrame implements IDisposable {
 	private InformationListPanel informationTextPanel;
 	private EnderEyePanel enderEyePanel;
 
-	private static final String TITLE_TEXT = I18n.get("title");
+	private static final String TITLE_TEXT = Main.APP_NAME + " ";
 	private static final String VERSION_TEXT = "v" + Main.VERSION;
+
+	/** How often the frosted glass backdrop re-reads what is behind the window. */
+	private static final int BACKDROP_REFRESHES_PER_SECOND = 8;
 
 	private final StyleManager styleManager;
 
 	public NinjabrainBotFrame(StyleManager styleManager, NinjabrainBotPreferences preferences, IUpdateChecker updateChecker, IDataState dataState, IButtonInputHandler buttonInputHandler, InformationMessageList informationMessageList) {
-		super(styleManager, preferences, TITLE_TEXT);
+		super(styleManager, preferences, TITLE_TEXT, true);
 		this.preferences = preferences;
+		this.styleManager = styleManager;
 		Profiler.start("NinjabrainBotFrame");
 		setLocation(preferences.windowX.get(), preferences.windowY.get()); // Set window position
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setTranslucent(preferences.translucent.get());
+		updateWindowTranslucency(false);
 		setAppIcon();
 
 		createTitleBar(styleManager, dataState, updateChecker);
 		createComponents(styleManager, dataState, buttonInputHandler, informationMessageList);
 		setupSubscriptions(styleManager, dataState);
 		Profiler.stop();
+	}
 
-		this.styleManager = styleManager;
+	@Override
+	public void addNotify() {
+		super.addNotify();
+		SwingUtilities.invokeLater(() -> updateWindowTranslucency(true));
 	}
 
 	@Override
@@ -98,7 +108,9 @@ public class NinjabrainBotFrame extends ThemedFrame implements IDisposable {
 
 	private void setupSubscriptions(StyleManager styleManager, IDataState dataState) {
 		// Settings
-		disposeHandler.add(preferences.translucent.whenModified().subscribeEDT(this::setTranslucent));
+		disposeHandler.add(preferences.translucent.whenModified().subscribeEDT(__ -> updateWindowTranslucency()));
+		disposeHandler.add(preferences.blurredBackground.whenModified().subscribeEDT(__ -> updateWindowTranslucency()));
+		disposeHandler.add(preferences.windowOpacity.whenModified().subscribeEDT(__ -> updateWindowTranslucency()));
 		disposeHandler.add(preferences.alwaysOnTop.whenModified().subscribeEDT(this::setAlwaysOnTop));
 		disposeHandler.add(preferences.hotkeyMinimize.whenTriggered().subscribeEDT(__ -> toggleMinimized()));
 		// Components bounds changed
@@ -178,11 +190,25 @@ public class NinjabrainBotFrame extends ThemedFrame implements IDisposable {
 		}
 	}
 
-	private void setTranslucent(boolean t) {
+	private void updateWindowTranslucency() {
+		updateWindowTranslucency(true);
+	}
+
+	private void updateWindowTranslucency(boolean refreshStyles) {
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		GraphicsDevice gd = ge.getDefaultScreenDevice();
-		if (gd.isWindowTranslucencySupported(WindowTranslucency.TRANSLUCENT)) {
-			setOpacity(t ? 0.75f : 1.0f);
+		boolean supported = gd.isWindowTranslucencySupported(WindowTranslucency.PERPIXEL_TRANSLUCENT);
+		boolean translucent = supported && preferences.translucent.get();
+
+		float opacity = Math.max(0.2f, Math.min(1f, preferences.windowOpacity.get() / 100f));
+		Translucency.configure(this, translucent ? Math.round(255 * opacity) : 255);
+
+		if (glassBackdrop != null)
+			glassBackdrop.setEnabled(translucent && preferences.blurredBackground.get(), BACKDROP_REFRESHES_PER_SECOND);
+
+		if (refreshStyles && styleManager != null) {
+			styleManager.updateFontsAndColors();
+			repaint();
 		}
 	}
 

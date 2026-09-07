@@ -1,12 +1,14 @@
 package ninjabrainbot.gui.components.panels;
 
 import java.awt.Color;
+import java.awt.Graphics;
 
 import javax.swing.JPanel;
 
 import ninjabrainbot.gui.components.ThemedComponent;
 import ninjabrainbot.gui.style.SizePreference;
 import ninjabrainbot.gui.style.StyleManager;
+import ninjabrainbot.gui.style.Translucency;
 import ninjabrainbot.gui.style.theme.WrappedColor;
 
 public class ThemedPanel extends JPanel implements ThemedComponent {
@@ -36,9 +38,24 @@ public class ThemedPanel extends JPanel implements ThemedComponent {
 	@Override
 	public void updateColors() {
 		Color bg = getBackgroundColor();
-		setBackground(bg);
+		boolean translucent = Translucency.appliesTo(this);
+		setOpaque(!translucent);
+		setBackground(translucent ? Translucency.apply(bg, this) : bg);
 		Color fg = getForegroundColor();
 		setForeground(fg);
+	}
+
+	/** Swing only fills the background of opaque components, so a see-through panel paints its own. */
+	@Override
+	protected void paintComponent(Graphics g) {
+		if (!isOpaque()) {
+			Color bg = getBackground();
+			if (bg != null) {
+				g.setColor(Translucency.isSuspended() ? Translucency.opaque(bg) : bg);
+				g.fillRect(0, 0, getWidth(), getHeight());
+			}
+		}
+		super.paintComponent(g);
 	}
 
 	public int getTextSize(SizePreference p) {

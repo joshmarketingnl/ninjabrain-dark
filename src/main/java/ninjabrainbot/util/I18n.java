@@ -25,7 +25,7 @@ public class I18n {
 	public static final Locale LANGUAGE;
 
 	static {
-		final Preferences preferences = Preferences.userNodeForPackage(Main.class);
+		final Preferences preferences = Preferences.userRoot().node(Main.PREFERENCES_NODE);
 		final String languageTag = preferences.get("language_v2", "");
 		Locale language = LanguageResources.getLocaleFromTag(languageTag);
 		if (language == null) {

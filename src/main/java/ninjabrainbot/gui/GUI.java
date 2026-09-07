@@ -104,7 +104,7 @@ public class GUI {
 		actionExecutor = modelState.actionExecutor;
 		environmentState = modelState.environmentState;
 		dataState = modelState.dataState;
-		domainModelImportExportService = new DomainModelImportExportService(domainModel, new TempFileAccessor("NinjabrainBot-save-state.txt"), preferences);
+		domainModelImportExportService = new DomainModelImportExportService(domainModel, new TempFileAccessor("NinjabrainLight-save-state.txt"), preferences);
 		domainModelImportExportService.triggerDeserialization();
 		domainModel.deleteHistory();
 		Profiler.stop();

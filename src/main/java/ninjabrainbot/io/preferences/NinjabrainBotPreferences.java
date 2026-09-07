@@ -45,6 +45,8 @@ public class NinjabrainBotPreferences {
 	public final DoublePreference crosshairCorrection;
 	public final BooleanPreference checkForUpdates;
 	public final BooleanPreference translucent;
+	public final BooleanPreference blurredBackground;
+	public final FloatPreference windowOpacity;
 	public final BooleanPreference alwaysOnTop;
 	public final BooleanPreference showNetherCoords;
 	public final BooleanPreference showAngleUpdates;
@@ -84,7 +86,7 @@ public class NinjabrainBotPreferences {
 		// Integer
 		windowX = new IntPreference("window_x", 100, source);
 		windowY = new IntPreference("window_y", 100, source);
-		theme = new IntPreference("theme", 1, source);
+		theme = new IntPreference("theme", 11, source);
 		settingsVersion = new IntPreference("settings_version", 0, source);
 		// Hotkey
 		hotkeyIncrement = new HotkeyPreference("hotkey_increment", source);
@@ -113,7 +115,9 @@ public class NinjabrainBotPreferences {
 		crosshairCorrection = new DoublePreference("crosshair_correction", 0, -1f, 1f, source);
 		// Boolean
 		checkForUpdates = new BooleanPreference("check_for_updates", true, source);
-		translucent = new BooleanPreference("translucent", false, source);
+		translucent = new BooleanPreference("translucent", true, source);
+		blurredBackground = new BooleanPreference("blurred_background", true, source);
+		windowOpacity = new FloatPreference("window_opacity", 75f, 20f, 100f, source);
 		alwaysOnTop = new BooleanPreference("always_on_top", true, source);
 		showNetherCoords = new BooleanPreference("show_nether_coords", true, source);
 		showAngleUpdates = new BooleanPreference("show_angle_updates", false, source);

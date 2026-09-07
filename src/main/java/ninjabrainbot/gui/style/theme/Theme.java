@@ -52,12 +52,13 @@ public abstract class Theme {
 	protected static final ArrayList<CustomTheme> CUSTOM_THEMES = new ArrayList<>();
 	protected static final DisposeHandler disposeHandler = new DisposeHandler();
 
-	private static Theme dark;
+	private static Theme defaultTheme;
 	private static int nextCustomThemeUID = -1;
 
 	public static void loadThemes(NinjabrainBotPreferences preferences) {
-		dark = new DarkTheme();
-		addStandardTheme(dark);
+		defaultTheme = new InvertedTheme();
+		addStandardTheme(defaultTheme);
+		addStandardTheme(new DarkTheme());
 		addStandardTheme(new LightTheme());
 		addStandardTheme(new BlueTheme());
 		addStandardTheme(new BastionTheme());
@@ -120,14 +121,14 @@ public abstract class Theme {
 	}
 
 	public static Theme get(int uid) {
-		Theme theme = THEMES.getOrDefault(uid, dark);
+		Theme theme = THEMES.getOrDefault(uid, defaultTheme);
 		if (!theme.loaded)
 			theme.loadTheme();
 		return theme;
 	}
 
 	public static CustomTheme getCustomTheme(int uid) {
-		Theme theme = THEMES.getOrDefault(uid, dark);
+		Theme theme = THEMES.getOrDefault(uid, defaultTheme);
 		if (!theme.loaded)
 			theme.loadTheme();
 		if (!(theme instanceof CustomTheme))
@@ -159,14 +160,14 @@ public abstract class Theme {
 
 	public static void createCustomTheme(NinjabrainBotPreferences preferences) {
 		CustomTheme theme = new CustomTheme("New theme", "", nextCustomThemeUID);
-		theme.setFromTheme(dark);
+		theme.setFromTheme(defaultTheme);
 		addCustomTheme(theme, preferences);
 		serializeCustomThemes(preferences);
 	}
 
 	public static void deleteCustomTheme(StyleManager styleManager, NinjabrainBotPreferences preferences, CustomTheme theme) {
 		if (styleManager.currentTheme.isTheme(theme))
-			styleManager.currentTheme.setTheme(dark);
+			styleManager.currentTheme.setTheme(defaultTheme);
 		THEMES.remove(theme.UID);
 		CUSTOM_THEMES.remove(theme);
 		serializeCustomThemes(preferences);
