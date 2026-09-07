@@ -36,13 +36,16 @@ public class BasicOptionsPanel extends JPanel {
 		column1.add(new CheckboxPanel(styleManager, I18n.get("settings.always_on_top"), preferences.alwaysOnTop));
 		column1.add(new CheckboxPanel(styleManager, I18n.get("settings.translucent_window"), preferences.translucent));
 		column1.add(new CheckboxPanel(styleManager, I18n.get("settings.blurred_background"), preferences.blurredBackground));
+		column1.add(new CheckboxPanel(styleManager, I18n.get("settings.show_throw_coordinates"), preferences.showThrowCoordinates));
 		column1.add(new FloatPreferencePanel(styleManager, I18n.get("settings.window_opacity"), preferences.windowOpacity));
 		column1.add(new FloatPreferencePanel(styleManager, I18n.get("settings.focus_text_scale"), preferences.focusTextScale));
+		column1.add(new FloatPreferencePanel(styleManager, I18n.get("settings.blur_refresh_rate"), preferences.blurRefreshRate));
 		column1.add(new CheckboxPanel(styleManager, I18n.get("settings.notify_when_a_new_version_is_available"), preferences.checkForUpdates));
 
 		// Column 2
 		column2.add(new RadioButtonPanel(styleManager, I18n.get("settings.display_stronghold_location_using"), preferences.strongholdDisplayType));
 		column2.add(new RadioButtonPanel(styleManager, I18n.get("settings.view_type"), preferences.view));
+		column2.add(new RadioButtonPanel(styleManager, I18n.get("settings.focus_layout"), preferences.focusLayout));
 		column2.add(new RadioButtonPanel(styleManager, I18n.get("settings.window_size"), preferences.size));
 		column2.add(new RadioButtonPanel(styleManager, I18n.get("settings.mc_version"), preferences.mcVersion));
 	}

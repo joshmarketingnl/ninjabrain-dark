@@ -140,50 +140,37 @@ public class ThrowPanel extends ThemedPanel implements IDisposable {
 	public void setBounds(int x, int y, int width, int height) {
 		super.setBounds(x, y, width, height);
 		int w = width - height;
-		if (!preferences.showAngleErrors.get()) {
-			if (this.x != null)
-				this.x.setBounds(0, 0, w / 3, height);
-			if (this.z != null)
-				this.z.setBounds(w / 3, 0, w / 3, height);
-			if (this.alpha != null) {
-				if (correctionSgn != 0) {
-					int w1 = w / 3 * 3 / 4;
-					int dx = w / 3 / 8;
-					this.alpha.setBounds(2 * w / 3 - dx, 0, w1, height);
-					this.alpha.setHorizontalAlignment(SwingConstants.RIGHT);
-					this.correction.setBounds(2 * w / 3 + w1 - dx, 0, w1, height);
-					this.correction.setHorizontalAlignment(SwingConstants.LEFT);
-				} else {
-					this.alpha.setBounds(2 * w / 3, 0, w / 3, height);
-					this.alpha.setHorizontalAlignment(SwingConstants.CENTER);
-				}
-			}
-			if (this.removeButton != null)
-				this.removeButton.setBounds(w, 0, height, height - 1);
-		} else {
-			if (this.x != null)
-				this.x.setBounds(0, 0, w / 4, height);
-			if (this.z != null)
-				this.z.setBounds(w / 4, 0, w / 4, height);
-			if (this.alpha != null) {
-				if (correctionSgn != 0) {
-					int w1 = w / 4 * 3 / 4;
-					int dx = w / 4 / 8;
-					this.alpha.setBounds(2 * w / 4 - dx, 0, w1, height);
-					this.alpha.setHorizontalAlignment(SwingConstants.RIGHT);
-					this.correction.setBounds(2 * w / 4 + w1 - dx, 0, w1, height);
-					this.correction.setHorizontalAlignment(SwingConstants.LEFT);
-				} else {
-					this.alpha.setBounds(2 * w / 4, 0, w / 4, height);
-					this.alpha.setHorizontalAlignment(SwingConstants.CENTER);
-				}
-			}
-			if (this.error != null)
-				this.error.setBounds(3 * w / 4, 0, w / 4, height);
-			if (this.removeButton != null)
-				this.removeButton.setBounds(w, 0, height, height - 1);
+		boolean coordinates = preferences.showThrowCoordinates.get();
+		boolean errors = preferences.showAngleErrors.get();
+		this.x.setVisible(coordinates);
+		this.z.setVisible(coordinates);
+		error.setVisible(errors);
+
+		int columns = (coordinates ? 2 : 0) + 1 + (errors ? 1 : 0);
+		int columnWidth = w / columns;
+		int column = 0;
+		if (coordinates) {
+			this.x.setBounds(0, 0, columnWidth, height);
+			this.z.setBounds(columnWidth, 0, columnWidth, height);
+			column = 2;
 		}
-		error.setVisible(preferences.showAngleErrors.get());
+		int alphaX = column * columnWidth;
+		if (correctionSgn != 0) {
+			int w1 = columnWidth * 3 / 4;
+			int dx = columnWidth / 8;
+			this.alpha.setBounds(alphaX - dx, 0, w1, height);
+			this.alpha.setHorizontalAlignment(SwingConstants.RIGHT);
+			this.correction.setBounds(alphaX + w1 - dx, 0, w1, height);
+			this.correction.setHorizontalAlignment(SwingConstants.LEFT);
+		} else {
+			this.alpha.setBounds(alphaX, 0, columnWidth, height);
+			this.alpha.setHorizontalAlignment(SwingConstants.CENTER);
+		}
+		column++;
+		if (errors)
+			this.error.setBounds(column * columnWidth, 0, columnWidth, height);
+		if (this.removeButton != null)
+			this.removeButton.setBounds(w, 0, height, height - 1);
 	}
 
 	@Override

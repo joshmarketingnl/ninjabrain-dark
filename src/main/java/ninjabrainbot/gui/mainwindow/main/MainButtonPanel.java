@@ -19,13 +19,17 @@ import ninjabrainbot.util.I18n;
 public class MainButtonPanel extends StretchPanel {
 
 	private final WrappedColor borderCol;
+	private final ThemedLabel throwsLabel;
+
+	/** Below this width the caption is dropped so Undo, Redo and Reset still fit. */
+	private static final int CAPTION_MIN_WIDTH = 340;
 
 	public MainButtonPanel(StyleManager styleManager, IButtonInputHandler buttonInputHandler) {
 		super(styleManager, true);
 		setOpaque(true);
 //		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 		setAlignmentX(0);
-		ThemedLabel throwsLabel = new ThemedLabel(styleManager, I18n.get("ender_eye_throws"), true);
+		throwsLabel = new ThemedLabel(styleManager, I18n.get("ender_eye_throws"), true);
 		throwsLabel.setForegroundColor(styleManager.currentTheme.TEXT_COLOR_HEADER);
 		add(throwsLabel);
 		add(Box.createHorizontalGlue());
@@ -62,6 +66,8 @@ public class MainButtonPanel extends StretchPanel {
 	@Override
 	public void setBounds(int x, int y, int width, int height) {
 		super.setBounds(x, y, width, height);
+		if (throwsLabel != null)
+			throwsLabel.setVisible(width >= CAPTION_MIN_WIDTH);
 	}
 
 	private FlatButton getResetButton(StyleManager styleManager, IButtonInputHandler buttonInputHandler) {

@@ -67,8 +67,15 @@ public class StructureInformation implements IOverworldPosition, IDisposable {
 		return String.format(" (%s %.1f)", travelAngleDifference > 0 ? "->" : "<-", absChange);
 	}
 
+	/**
+	 * Spread over the range that is actually worth reading. Over 180 degrees, as upstream does,
+	 * everything under 20 degrees off comes out the same shade of green.
+	 */
+	private static final double TRAVEL_ANGLE_COLOR_RANGE = 30.0;
+
 	public float getTravelAngleDiffColor() {
-		return (float) (1 - Math.abs(travelAngleDifference) / 180.0);
+		double off = Math.min(1.0, Math.abs(travelAngleDifference) / TRAVEL_ANGLE_COLOR_RANGE);
+		return (float) (1 - off);
 	}
 
 	@Override

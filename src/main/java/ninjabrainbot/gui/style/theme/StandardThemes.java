@@ -89,8 +89,8 @@ class InvertedTheme extends Theme {
 		COLOR_POSITIVE = createColor(Color.decode("#1F8B34"));
 		COLOR_NEGATIVE = createColor(Color.decode("#C0392B"));
 
-		COLOR_GRADIENT_0 = createColor(Color.decode("#C62828"));
-		COLOR_GRADIENT_50 = createColor(Color.decode("#B8860B"));
+		COLOR_GRADIENT_0 = createColor(Color.decode("#D32F2F"));
+		COLOR_GRADIENT_50 = createColor(Color.decode("#E08A00"));
 		COLOR_GRADIENT_100 = createColor(Color.decode("#128C2A"));
 	}
 }

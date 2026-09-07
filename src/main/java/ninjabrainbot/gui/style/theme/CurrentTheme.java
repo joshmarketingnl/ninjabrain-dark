@@ -26,6 +26,7 @@ public class CurrentTheme {
 	public final WrappedColor TEXT_COLOR_TITLE = new WrappedColor();
 
 	public final Wrapper<ColorMap> CERTAINTY_COLOR_MAP = new Wrapper<>();
+	public final Wrapper<ColorMap> ANGLE_COLOR_MAP = new Wrapper<>();
 
 	private final ObservableProperty<CurrentTheme> whenModified = new ObservableProperty<>();
 
@@ -52,6 +53,7 @@ public class CurrentTheme {
 		COLOR_NEGATIVE.set(theme.COLOR_NEGATIVE);
 
 		CERTAINTY_COLOR_MAP.set(new ColorMap(theme.COLOR_GRADIENT_0.color(), theme.COLOR_GRADIENT_50.color(), theme.COLOR_GRADIENT_100.color()));
+		ANGLE_COLOR_MAP.set(new ColorMap(theme.COLOR_GRADIENT_0.color(), theme.COLOR_GRADIENT_50.color(), theme.COLOR_GRADIENT_100.color()));
 
 		updateSubscription(theme);
 		whenModified.notifySubscribers(this);

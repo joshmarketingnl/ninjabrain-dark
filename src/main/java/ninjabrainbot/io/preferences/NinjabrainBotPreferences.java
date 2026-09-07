@@ -7,6 +7,7 @@ import ninjabrainbot.io.preferences.enums.AllAdvancementsToggleType;
 import ninjabrainbot.io.preferences.enums.AngleAdjustmentDisplayType;
 import ninjabrainbot.io.preferences.enums.AngleAdjustmentType;
 import ninjabrainbot.io.preferences.enums.DefaultBoatType;
+import ninjabrainbot.io.preferences.enums.FocusLayoutType;
 import ninjabrainbot.io.preferences.enums.MainViewType;
 import ninjabrainbot.io.preferences.enums.McVersion;
 import ninjabrainbot.io.preferences.enums.SizeSetting;
@@ -46,8 +47,11 @@ public class NinjabrainBotPreferences {
 	public final BooleanPreference checkForUpdates;
 	public final BooleanPreference translucent;
 	public final BooleanPreference blurredBackground;
+	public final BooleanPreference showThrowCoordinates;
 	public final FloatPreference windowOpacity;
 	public final FloatPreference focusTextScale;
+	public final MultipleChoicePreference<FocusLayoutType> focusLayout;
+	public final FloatPreference blurRefreshRate;
 	public final BooleanPreference alwaysOnTop;
 	public final BooleanPreference showNetherCoords;
 	public final BooleanPreference showAngleUpdates;
@@ -116,10 +120,13 @@ public class NinjabrainBotPreferences {
 		crosshairCorrection = new DoublePreference("crosshair_correction", 0, -1f, 1f, source);
 		// Boolean
 		checkForUpdates = new BooleanPreference("check_for_updates", true, source);
-		translucent = new BooleanPreference("translucent", true, source);
-		blurredBackground = new BooleanPreference("blurred_background", true, source);
+		translucent = new BooleanPreference("translucent", false, source);
+		blurredBackground = new BooleanPreference("blurred_background", false, source);
+		showThrowCoordinates = new BooleanPreference("show_throw_coordinates", false, source);
 		windowOpacity = new FloatPreference("window_opacity", 75f, 20f, 100f, source);
 		focusTextScale = new FloatPreference("focus_text_scale", 190f, 100f, 300f, source);
+		focusLayout = new MultipleChoicePreference<>("focus_layout", FocusLayoutType.GRID, new int[] { 0, 1, 2 }, new FocusLayoutType[] { FocusLayoutType.ROW, FocusLayoutType.GRID, FocusLayoutType.STACKED }, source);
+		blurRefreshRate = new FloatPreference("blur_refresh_rate", 12f, 2f, 60f, source);
 		alwaysOnTop = new BooleanPreference("always_on_top", true, source);
 		showNetherCoords = new BooleanPreference("show_nether_coords", true, source);
 		showAngleUpdates = new BooleanPreference("show_angle_updates", false, source);

@@ -12,7 +12,7 @@ import ninjabrainbot.gui.components.panels.ThemedPanel;
 import ninjabrainbot.gui.style.SizePreference;
 import ninjabrainbot.gui.style.StyleManager;
 import ninjabrainbot.gui.style.theme.WrappedColor;
-import ninjabrainbot.io.preferences.BooleanPreference;
+import ninjabrainbot.io.preferences.NinjabrainBotPreferences;
 import ninjabrainbot.model.datastate.endereye.NormalEnderEyeThrow;
 import ninjabrainbot.util.I18n;
 
@@ -26,18 +26,20 @@ public class ThrowPanelHeader extends ThemedPanel {
 	private final JLabel alpha;
 	private final JLabel error;
 
+	private final NinjabrainBotPreferences preferences;
 	private boolean errorsEnabled;
 
 	final WrappedColor lineColor;
 
-	public ThrowPanelHeader(StyleManager styleManager, BooleanPreference showAngleErrors) {
-		this(styleManager, showAngleErrors, null);
+	public ThrowPanelHeader(StyleManager styleManager, NinjabrainBotPreferences preferences) {
+		this(styleManager, preferences, null);
 	}
 
-	public ThrowPanelHeader(StyleManager styleManager, BooleanPreference showAngleErrors, NormalEnderEyeThrow t) {
+	public ThrowPanelHeader(StyleManager styleManager, NinjabrainBotPreferences preferences, NormalEnderEyeThrow t) {
 		super(styleManager, true);
+		this.preferences = preferences;
 		setOpaque(true);
-		errorsEnabled = showAngleErrors.get();
+		errorsEnabled = preferences.showAngleErrors.get();
 		x = new JLabel("x", SwingConstants.CENTER);
 		z = new JLabel("z", SwingConstants.CENTER);
 		alpha = new JLabel(I18n.get("angle"), SwingConstants.CENTER);
@@ -74,25 +76,20 @@ public class ThrowPanelHeader extends ThemedPanel {
 	public void setBounds(int x, int y, int width, int height) {
 		super.setBounds(x, y, width, height);
 		int w = width - height;
-		int y0 = -1;
-		if (!errorsEnabled) {
-			if (this.x != null)
-				this.x.setBounds(0, y0, w / 3, height);
-			if (this.z != null)
-				this.z.setBounds(w / 3, y0, w / 3, height);
-			if (this.alpha != null)
-				this.alpha.setBounds(2 * w / 3, y0, w / 3, height);
-		} else {
-			if (this.x != null)
-				this.x.setBounds(0, y0, w / 4, height);
-			if (this.z != null)
-				this.z.setBounds(w / 4, y0, w / 4, height);
-			if (this.alpha != null)
-				this.alpha.setBounds(2 * w / 4, y0, w / 4, height);
-			if (this.error != null)
-				this.error.setBounds(3 * w / 4, y0, w / 4, height);
-		}
+		boolean coordinates = preferences.showThrowCoordinates.get();
+		this.x.setVisible(coordinates);
+		this.z.setVisible(coordinates);
 		error.setVisible(errorsEnabled);
+		java.util.List<JLabel> columns = new java.util.ArrayList<>();
+		if (coordinates) {
+			columns.add(this.x);
+			columns.add(this.z);
+		}
+		columns.add(alpha);
+		if (errorsEnabled)
+			columns.add(error);
+		for (int i = 0; i < columns.size(); i++)
+			columns.get(i).setBounds(i * w / columns.size(), -1, w / columns.size(), height);
 	}
 
 	@Override

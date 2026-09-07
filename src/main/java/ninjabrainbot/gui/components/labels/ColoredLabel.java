@@ -8,7 +8,7 @@ import ninjabrainbot.util.Wrapper;
 
 public class ColoredLabel extends ThemedLabel {
 
-	final Wrapper<ColorMap> colorMap;
+	private Wrapper<ColorMap> colorMap;
 
 	private double lastColor = 0.0;
 
@@ -19,6 +19,11 @@ public class ColoredLabel extends ThemedLabel {
 	public ColoredLabel(StyleManager styleManager, boolean centered) {
 		super(styleManager, centered);
 		colorMap = styleManager.currentTheme.CERTAINTY_COLOR_MAP;
+	}
+
+	/** Lets a label use a different gradient than the certainty one, e.g. the angle gradient. */
+	public void setColorMap(Wrapper<ColorMap> colorMap) {
+		this.colorMap = colorMap;
 	}
 
 	public void setText(String text, float color) {

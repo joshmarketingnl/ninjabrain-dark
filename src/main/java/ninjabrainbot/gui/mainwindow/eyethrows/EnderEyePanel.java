@@ -21,7 +21,7 @@ public class EnderEyePanel extends ResizablePanel implements ThemedComponent {
 		styleManager.registerThemedComponent(this);
 		setOpaque(false);
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-		throwPanelHeader = new ThrowPanelHeader(styleManager, preferences.showAngleErrors);
+		throwPanelHeader = new ThrowPanelHeader(styleManager, preferences);
 		add(throwPanelHeader);
 		throwPanels = new ThrowPanel[dataState.getThrowList().maxCapacity()];
 		divineContextPanel = new DivineContextPanel(styleManager, dataState.getDivineContext(), buttonInputHandler, this::whenDivineContextVisibilityUpdated);
