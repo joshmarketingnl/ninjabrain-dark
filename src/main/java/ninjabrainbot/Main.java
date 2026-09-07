@@ -49,13 +49,14 @@ public class Main {
 	 * Writes what the app actually loaded to a file next to the save state. javaw has no console,
 	 * so this is the only way to see afterwards which settings a given launch picked up.
 	 */
-	private static void writeStartupDiagnostics(NinjabrainBotPreferences preferences) {
+	private static void writeStartupDiagnostics(NinjabrainBotPreferences preferences, ninjabrainbot.io.preferences.FilePreferences source) {
 		try {
 			java.io.File file = new java.io.File(System.getProperty("java.io.tmpdir"), "Ninjabrain-" + (DARK_EDITION ? "Dark" : "Light") + "-startup.log");
 			StringBuilder sb = new StringBuilder();
 			sb.append(new java.util.Date()).append(System.lineSeparator());
 			sb.append("edition        : ").append(DARK_EDITION ? "dark" : "light").append(System.lineSeparator());
-			sb.append("preferencesNode: ").append(PREFERENCES_NODE).append(System.lineSeparator());
+			sb.append("settingsFile   : ").append(source.getFile()).append(System.lineSeparator());
+			sb.append("settingsCount  : ").append(source.size()).append(System.lineSeparator());
 			sb.append("jar            : ").append(Main.class.getProtectionDomain().getCodeSource().getLocation()).append(System.lineSeparator());
 			sb.append("hotkey reset   : ").append(preferences.hotkeyReset.getCode()).append(System.lineSeparator());
 			sb.append("hotkey incr    : ").append(preferences.hotkeyIncrement.getCode()).append(System.lineSeparator());
@@ -81,10 +82,10 @@ public class Main {
 
 		Progress.setTask("Loading preferences", 0.04f);
 		Profiler.stopAndStart("Initialize preferences");
-		ninjabrainbot.io.preferences.PreferencesBootstrap.inheritFromOriginalIfNew();
-		NinjabrainBotPreferences preferences = new NinjabrainBotPreferences(new SavedPreferences());
+		ninjabrainbot.io.preferences.FilePreferences preferenceSource = new ninjabrainbot.io.preferences.FilePreferences();
+		NinjabrainBotPreferences preferences = new NinjabrainBotPreferences(preferenceSource);
 
-		writeStartupDiagnostics(preferences);
+		writeStartupDiagnostics(preferences, preferenceSource);
 
 		Progress.setTask("Calculating approximated stronghold density", 0.05f);
 		Profiler.stopAndStart("Calculate approximated density");

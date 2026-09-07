@@ -9,7 +9,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
-import java.util.prefs.Preferences;
 
 import ninjabrainbot.Main;
 import ninjabrainbot.io.LanguageResources;
@@ -25,13 +24,12 @@ public class I18n {
 	public static final Locale LANGUAGE;
 
 	static {
-		final Preferences preferences = Preferences.userRoot().node(Main.PREFERENCES_NODE);
-		final String languageTag = preferences.get("language_v2", "");
+		final String languageTag = ninjabrainbot.io.preferences.FilePreferences.readSetting("language_v2", "");
 		Locale language = LanguageResources.getLocaleFromTag(languageTag);
 		if (language == null) {
 			Locale defaultLocale = Locale.getDefault();
 			language = LanguageResources.isLocaleSupported(defaultLocale) ? defaultLocale : LanguageResources.getDefaultLocale();
-			preferences.put("language_v2", language.toLanguageTag());
+			ninjabrainbot.io.preferences.FilePreferences.writeSetting("language_v2", language.toLanguageTag());
 		}
 		LANGUAGE = language;
 		BUNDLE = ResourceBundle.getBundle("lang/I18n", LANGUAGE, new UTF8Control());
