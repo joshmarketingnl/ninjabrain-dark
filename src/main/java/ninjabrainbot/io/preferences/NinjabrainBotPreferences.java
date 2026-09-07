@@ -157,7 +157,7 @@ public class NinjabrainBotPreferences {
 		size = new MultipleChoicePreference<>("size", SizeSetting.SMALL, new int[] { 0, 1, 2 }, new SizeSetting[] { SizeSetting.SMALL, SizeSetting.MEDIUM, SizeSetting.LARGE }, source);
 		strongholdDisplayType = new MultipleChoicePreference<>("stronghold_display_type", StrongholdDisplayType.FOURFOUR, new int[] { 0, 1, 2 },
 				new StrongholdDisplayType[] { StrongholdDisplayType.FOURFOUR, StrongholdDisplayType.EIGHTEIGHT, StrongholdDisplayType.CHUNK }, source);
-		view = new MultipleChoicePreference<>("view", MainViewType.BASIC, new int[] { 0, 1, 2 }, new MainViewType[] { MainViewType.BASIC, MainViewType.DETAILED, MainViewType.FOCUS }, source);
+		view = new MultipleChoicePreference<>("view", MainViewType.FOCUS, new int[] { 0, 1, 2 }, new MainViewType[] { MainViewType.BASIC, MainViewType.DETAILED, MainViewType.FOCUS }, source);
 		mcVersion = new MultipleChoicePreference<>("mc_version", McVersion.PRE_119, new int[] { 0, 1 }, new McVersion[] { McVersion.PRE_119, McVersion.POST_119 }, source);
 		allAdvancementsToggleType = new MultipleChoicePreference<>("aa_toggle_type", AllAdvancementsToggleType.Automatic, new int[] { 0, 1 }, new AllAdvancementsToggleType[] { AllAdvancementsToggleType.Automatic, AllAdvancementsToggleType.Hotkey }, source);
 		defaultBoatType = new MultipleChoicePreference<>("default_boat_type", DefaultBoatType.GRAY, new int[] { 0, 1, 2 },
