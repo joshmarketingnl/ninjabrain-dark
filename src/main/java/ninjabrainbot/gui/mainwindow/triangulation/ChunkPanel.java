@@ -50,6 +50,9 @@ public class ChunkPanel extends ThemedPanel implements IDisposable {
 
 	private final WrappedColor borderCol;
 
+	/** 1 = the normal row height used by the detailed view, larger values grow the whole row. */
+	private float textScale = 1f;
+
 	public ChunkPanel(StyleManager styleManager, NinjabrainBotPreferences preferences) {
 		this(styleManager, preferences, null);
 	}
@@ -94,6 +97,15 @@ public class ChunkPanel extends ThemedPanel implements IDisposable {
 
 	public void setAngleUpdatesEnabled(boolean b) {
 		angle.setVisible(b);
+	}
+
+	public void setTextScale(float textScale) {
+		this.textScale = textScale;
+		location.setTextSizeScale(textScale);
+		certainty.setTextSizeScale(textScale);
+		distance.setTextSizeScale(textScale);
+		nether.setTextSizeScale(textScale);
+		angle.setTextSizeScale(textScale);
 	}
 
 	public void setPrediction(ChunkPrediction chunkPrediction) {
@@ -158,12 +170,12 @@ public class ChunkPanel extends ThemedPanel implements IDisposable {
 	@Override
 	public void updateSize(StyleManager styleManager) {
 		super.updateSize(styleManager);
-		setPreferredSize(new Dimension(styleManager.size.WIDTH, styleManager.size.TEXT_SIZE_MEDIUM + styleManager.size.PADDING_THIN * 2));
+		setPreferredSize(new Dimension(styleManager.size.WIDTH, getTextSize(styleManager.size) + styleManager.size.PADDING_THIN * 2));
 	}
 
 	@Override
 	public int getTextSize(SizePreference p) {
-		return p.TEXT_SIZE_MEDIUM;
+		return Math.round(p.TEXT_SIZE_MEDIUM * textScale);
 	}
 
 	@Override

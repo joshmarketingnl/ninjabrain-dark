@@ -34,7 +34,9 @@ public class Splash {
 	public Splash(boolean disabled) {
 		splashScreen = SplashScreen.getSplashScreen();
 		if (splashScreen == null) {
-			System.err.println("Could not load splash screen");
+			// Expected here: this fork ships without a manifest splash, because the JVM always
+			// centres it on the primary monitor and that pulls the user out of a fullscreen game.
+			Logger.log("No splash screen, starting without one.");
 			return;
 		}
 		if (disabled) {

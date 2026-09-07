@@ -27,6 +27,7 @@ import ninjabrainbot.gui.components.labels.ThemedLabel;
 import ninjabrainbot.gui.mainwindow.boateye.BoatIcon;
 import ninjabrainbot.gui.mainwindow.boateye.Mod360Icon;
 import ninjabrainbot.gui.mainwindow.eyethrows.EnderEyePanel;
+import ninjabrainbot.gui.mainwindow.triangulation.FocusTriangulationPanel;
 import ninjabrainbot.gui.mainwindow.information.InformationListPanel;
 import ninjabrainbot.gui.mainwindow.main.MainButtonPanel;
 import ninjabrainbot.gui.mainwindow.main.MainTextArea;
@@ -37,6 +38,7 @@ import ninjabrainbot.io.preferences.NinjabrainBotPreferences;
 import ninjabrainbot.io.preferences.enums.MainViewType;
 import ninjabrainbot.io.updatechecker.IUpdateChecker;
 import ninjabrainbot.model.datastate.IDataState;
+import ninjabrainbot.model.datastate.common.ResultType;
 import ninjabrainbot.model.information.InformationMessageList;
 import ninjabrainbot.model.input.IButtonInputHandler;
 import ninjabrainbot.util.I18n;
@@ -45,6 +47,7 @@ import ninjabrainbot.util.Profiler;
 public class NinjabrainBotFrame extends ThemedFrame implements IDisposable {
 
 	private final NinjabrainBotPreferences preferences;
+	private final IDataState dataState;
 
 	private ThemedLabel versionTextLabel;
 	private JButton settingsButton;
@@ -65,6 +68,7 @@ public class NinjabrainBotFrame extends ThemedFrame implements IDisposable {
 	public NinjabrainBotFrame(StyleManager styleManager, NinjabrainBotPreferences preferences, IUpdateChecker updateChecker, IDataState dataState, IButtonInputHandler buttonInputHandler, InformationMessageList informationMessageList) {
 		super(styleManager, preferences, TITLE_TEXT, true);
 		this.preferences = preferences;
+		this.dataState = dataState;
 		this.styleManager = styleManager;
 		Profiler.start("NinjabrainBotFrame");
 		setLocation(preferences.windowX.get(), preferences.windowY.get()); // Set window position
@@ -93,7 +97,7 @@ public class NinjabrainBotFrame extends ThemedFrame implements IDisposable {
 		int versionwidth = styleManager.getTextWidth(VERSION_TEXT, styleManager.fontSize(styleManager.size.TEXT_SIZE_TITLE_SMALL, false));
 		lockIcon.setBounds(titlewidth + versionwidth + (titlebarHeight - styleManager.size.TEXT_SIZE_TITLE_SMALL) / 2, 0, titlebarHeight, titlebarHeight);
 		// Frame size
-		int extraWidth = preferences.showAngleUpdates.get() && preferences.view.get().equals(MainViewType.DETAILED) ? styleManager.size.ANGLE_COLUMN_WIDTH : 0;
+		int extraWidth = getExtraWidth(styleManager);
 		setSize(styleManager.size.WIDTH + extraWidth, getPreferredSize().height);
 		setShape(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), styleManager.size.WINDOW_ROUNDING, styleManager.size.WINDOW_ROUNDING));
 	}
@@ -111,6 +115,8 @@ public class NinjabrainBotFrame extends ThemedFrame implements IDisposable {
 		disposeHandler.add(preferences.translucent.whenModified().subscribeEDT(__ -> updateWindowTranslucency()));
 		disposeHandler.add(preferences.blurredBackground.whenModified().subscribeEDT(__ -> updateWindowTranslucency()));
 		disposeHandler.add(preferences.windowOpacity.whenModified().subscribeEDT(__ -> updateWindowTranslucency()));
+		disposeHandler.add(preferences.focusTextScale.whenModified().subscribeEDT(__ -> refreshLayout()));
+		disposeHandler.add(preferences.view.whenModified().subscribeEDT(__ -> refreshLayout()));
 		disposeHandler.add(preferences.alwaysOnTop.whenModified().subscribeEDT(this::setAlwaysOnTop));
 		disposeHandler.add(preferences.hotkeyMinimize.whenTriggered().subscribeEDT(__ -> toggleMinimized()));
 		// Components bounds changed
@@ -137,6 +143,7 @@ public class NinjabrainBotFrame extends ThemedFrame implements IDisposable {
 		titlebarPanel.addButton(settingsButton);
 		NotificationsButton notificationsButton = new NotificationsButton(styleManager, this, preferences, updateChecker);
 		titlebarPanel.addButton(notificationsButton);
+		titlebarPanel.addButton(createTranslucencyButton(styleManager));
 		titlebarPanel.addButton(new BoatIcon(styleManager, dataState.boatDataState().boatState(), preferences, disposeHandler));
 		titlebarPanel.addButton(new Mod360Icon(styleManager, dataState.boatDataState(), preferences, disposeHandler));
 	}
@@ -175,6 +182,15 @@ public class NinjabrainBotFrame extends ThemedFrame implements IDisposable {
 		return button;
 	}
 
+	/** One click switch between the frosted glass look and a fully opaque window. */
+	private FlatButton createTranslucencyButton(StyleManager styleManager) {
+		URL iconURL = Main.class.getResource("/translucency_icon.png");
+		FlatButton button = new TitleBarButton(styleManager, new ImageIcon(Objects.requireNonNull(iconURL)));
+		button.setToolTipText(I18n.get("settings.translucent_window"));
+		button.addActionListener(__ -> preferences.translucent.set(!preferences.translucent.get()));
+		return button;
+	}
+
 	private FlatButton createSettingsButton(StyleManager styleManager) {
 		URL iconURL = Main.class.getResource("/settings_icon.png");
 		ImageIcon img = new ImageIcon(iconURL);
@@ -188,6 +204,30 @@ public class NinjabrainBotFrame extends ThemedFrame implements IDisposable {
 		} else {
 			setState(JFrame.ICONIFIED);
 		}
+	}
+
+	/**
+	 * The focus view scales its single result row up, so the window has to grow with it, otherwise
+	 * the large coordinates get cut off.
+	 */
+	private int getExtraWidth(StyleManager styleManager) {
+		MainViewType view = preferences.view.get();
+		// Only the triangulation card is enlarged; blind and divine keep the normal window width.
+		if (view.equals(MainViewType.FOCUS) && dataState.resultType().get() == ResultType.TRIANGULATION) {
+			float scale = FocusTriangulationPanel.textScale(preferences);
+			int scaled = Math.round(styleManager.size.WIDTH * scale) - styleManager.size.WIDTH;
+			if (preferences.showAngleUpdates.get())
+				scaled += Math.round(styleManager.size.ANGLE_COLUMN_WIDTH * scale);
+			return scaled;
+		}
+		if (preferences.showAngleUpdates.get() && view.equals(MainViewType.DETAILED))
+			return styleManager.size.ANGLE_COLUMN_WIDTH;
+		return 0;
+	}
+
+	private void refreshLayout() {
+		styleManager.updateFontsAndColors();
+		updateSize(styleManager);
 	}
 
 	private void updateWindowTranslucency() {
@@ -213,7 +253,7 @@ public class NinjabrainBotFrame extends ThemedFrame implements IDisposable {
 	}
 
 	private void updateSize(StyleManager styleManager) {
-		int extraWidth = preferences.showAngleUpdates.get() && preferences.view.get().equals(MainViewType.DETAILED) ? styleManager.size.ANGLE_COLUMN_WIDTH : 0;
+		int extraWidth = getExtraWidth(styleManager);
 		setSize(styleManager.size.WIDTH + extraWidth, getPreferredSize().height);
 		setShape(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), styleManager.size.WINDOW_ROUNDING, styleManager.size.WINDOW_ROUNDING));
 	}

@@ -20,7 +20,8 @@
                             <mainClass>ninjabrainbot.Main</mainClass>
                         </manifest>
                         <manifestEntries>
-                            <SplashScreen-Image>splash.png</SplashScreen-Image>
+                            <!-- No SplashScreen-Image: the JVM always centres the splash on the
+                                 primary monitor, which pulls the user out of a fullscreen game. -->
                             <Built-By>Ninjabrain</Built-By>
                         </manifestEntries>
                     </archive>

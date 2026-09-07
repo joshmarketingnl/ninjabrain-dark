@@ -46,6 +46,11 @@ public class ColorMapLabel extends JPanel implements ILabel {
 		textLabel.setForegroundColor(color);
 	}
 
+	public void setTextSizeScale(float textSizeScale) {
+		textLabel.setTextSizeScale(textSizeScale);
+		coloredLabel.setTextSizeScale(textSizeScale);
+	}
+
 	public void setColoredText(String text, float color) {
 		coloredLabel.setText(text, color);
 	}

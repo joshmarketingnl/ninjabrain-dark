@@ -47,6 +47,7 @@ public class NinjabrainBotPreferences {
 	public final BooleanPreference translucent;
 	public final BooleanPreference blurredBackground;
 	public final FloatPreference windowOpacity;
+	public final FloatPreference focusTextScale;
 	public final BooleanPreference alwaysOnTop;
 	public final BooleanPreference showNetherCoords;
 	public final BooleanPreference showAngleUpdates;
@@ -118,6 +119,7 @@ public class NinjabrainBotPreferences {
 		translucent = new BooleanPreference("translucent", true, source);
 		blurredBackground = new BooleanPreference("blurred_background", true, source);
 		windowOpacity = new FloatPreference("window_opacity", 75f, 20f, 100f, source);
+		focusTextScale = new FloatPreference("focus_text_scale", 190f, 100f, 300f, source);
 		alwaysOnTop = new BooleanPreference("always_on_top", true, source);
 		showNetherCoords = new BooleanPreference("show_nether_coords", true, source);
 		showAngleUpdates = new BooleanPreference("show_angle_updates", false, source);
@@ -148,7 +150,7 @@ public class NinjabrainBotPreferences {
 		size = new MultipleChoicePreference<>("size", SizeSetting.SMALL, new int[] { 0, 1, 2 }, new SizeSetting[] { SizeSetting.SMALL, SizeSetting.MEDIUM, SizeSetting.LARGE }, source);
 		strongholdDisplayType = new MultipleChoicePreference<>("stronghold_display_type", StrongholdDisplayType.FOURFOUR, new int[] { 0, 1, 2 },
 				new StrongholdDisplayType[] { StrongholdDisplayType.FOURFOUR, StrongholdDisplayType.EIGHTEIGHT, StrongholdDisplayType.CHUNK }, source);
-		view = new MultipleChoicePreference<>("view", MainViewType.BASIC, new int[] { 0, 1 }, new MainViewType[] { MainViewType.BASIC, MainViewType.DETAILED }, source);
+		view = new MultipleChoicePreference<>("view", MainViewType.BASIC, new int[] { 0, 1, 2 }, new MainViewType[] { MainViewType.BASIC, MainViewType.DETAILED, MainViewType.FOCUS }, source);
 		mcVersion = new MultipleChoicePreference<>("mc_version", McVersion.PRE_119, new int[] { 0, 1 }, new McVersion[] { McVersion.PRE_119, McVersion.POST_119 }, source);
 		allAdvancementsToggleType = new MultipleChoicePreference<>("aa_toggle_type", AllAdvancementsToggleType.Automatic, new int[] { 0, 1 }, new AllAdvancementsToggleType[] { AllAdvancementsToggleType.Automatic, AllAdvancementsToggleType.Hotkey }, source);
 		defaultBoatType = new MultipleChoicePreference<>("default_boat_type", DefaultBoatType.GRAY, new int[] { 0, 1, 2 },

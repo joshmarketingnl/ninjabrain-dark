@@ -37,6 +37,7 @@ public class BasicOptionsPanel extends JPanel {
 		column1.add(new CheckboxPanel(styleManager, I18n.get("settings.translucent_window"), preferences.translucent));
 		column1.add(new CheckboxPanel(styleManager, I18n.get("settings.blurred_background"), preferences.blurredBackground));
 		column1.add(new FloatPreferencePanel(styleManager, I18n.get("settings.window_opacity"), preferences.windowOpacity));
+		column1.add(new FloatPreferencePanel(styleManager, I18n.get("settings.focus_text_scale"), preferences.focusTextScale));
 		column1.add(new CheckboxPanel(styleManager, I18n.get("settings.notify_when_a_new_version_is_available"), preferences.checkForUpdates));
 
 		// Column 2

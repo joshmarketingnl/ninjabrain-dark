@@ -17,6 +17,8 @@ public class ThemedLabel extends JLabel implements ThemedComponent, ILabel {
 	private WrappedColor bgCol;
 	private WrappedColor fgCol;
 
+	private float textSizeScale = 1f;
+
 	public ThemedLabel(StyleManager styleManager) {
 		this(styleManager, "");
 	}
@@ -44,7 +46,12 @@ public class ThemedLabel extends JLabel implements ThemedComponent, ILabel {
 	}
 
 	public void updateSize(StyleManager styleManager) {
-		setFont(styleManager.fontSize(getTextSize(styleManager.size), !bold));
+		setFont(styleManager.fontSize(getTextSize(styleManager.size) * textSizeScale, !bold));
+	}
+
+	/** Grows this single label without touching the rest of the window, used by the focus view. */
+	public void setTextSizeScale(float textSizeScale) {
+		this.textSizeScale = textSizeScale;
 	}
 
 	@Override
