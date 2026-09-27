@@ -1,5 +1,9 @@
 # Ninjabrain Dark / Light (fork)
 
+[![Download Ninjabrain Dark](https://img.shields.io/badge/Download-Ninjabrain%20Dark-1f2328?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/joshmarketingnl/ninjabrain-dark/raw/light-variant/download/Ninjabrain-Dark.zip)
+
+Unzip it and double-click **Ninjabrain Dark.bat** (or **Ninjabrain Light.bat**). Needs Java 8 or newer; if nothing happens, install it from [java.com](https://www.java.com/download/).
+
 A personal fork of [Ninjabrain Bot](https://github.com/Ninjabrain1/Ninjabrain-Bot) 1.5.2 (GPL-3.0). One jar, two editions that run next to the original install:
 
 - **Dark** (start with `-Dninjabrain.edition=dark`) and **Light** (default): own window title, settings file, save state, OBS overlay file, API port and icon.
