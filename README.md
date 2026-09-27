@@ -1,3 +1,17 @@
+# Ninjabrain Dark / Light (fork)
+
+A personal fork of [Ninjabrain Bot](https://github.com/Ninjabrain1/Ninjabrain-Bot) 1.5.2 (GPL-3.0). One jar, two editions that run next to the original install:
+
+- **Dark** (start with `-Dninjabrain.edition=dark`) and **Light** (default): own window title, settings file, save state, OBS overlay file, API port and icon.
+- Focus layouts with an angle colour gradient, optional frosted-glass translucency.
+- No splash screen (it always opened on the primary monitor and pulled you out of fullscreen).
+- Fix: a freshly started app no longer reads the F3+C already on the clipboard as the first throw.
+- Settings live in `%APPDATA%\Ninjabrain<Edition>\settings.properties` instead of `java.util.prefs`; on first start they are copied from the original app's settings.
+
+Build with `mvn package`. Everything below is the original README.
+
+---
+
 # Ninjabrain Bot
 
 An accurate stronghold calculator for Minecraft speedrunning. Achieves better results than regular calculators by accounting for user error and stronghold generation mechanics.
