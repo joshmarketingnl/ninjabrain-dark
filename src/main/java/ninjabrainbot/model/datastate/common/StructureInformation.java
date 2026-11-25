@@ -11,6 +11,9 @@ import ninjabrainbot.util.I18n;
 
 public class StructureInformation implements IOverworldPosition, IDisposable {
 
+	public static final int TRAVEL_ANGLE_GREEN_DEGREES = 10;
+	private static final double TRAVEL_ANGLE_COLOR_EXPONENT = 0.45;
+
 	private final IOverworldPosition overworldPosition;
 
 	private int overworldDistance;
@@ -76,9 +79,6 @@ public class StructureInformation implements IOverworldPosition, IDisposable {
 	 * within {@link #TRAVEL_ANGLE_GREEN_DEGREES} of the target, and from there a curve that still
 	 * changes colour all the way out to 180.
 	 */
-	private static final double TRAVEL_ANGLE_GREEN_DEGREES = 10.0;
-	private static final double TRAVEL_ANGLE_COLOR_EXPONENT = 0.45;
-
 	public float getTravelAngleDiffColor() {
 		double off = Math.abs(travelAngleDifference) - TRAVEL_ANGLE_GREEN_DEGREES;
 		if (off <= 0)

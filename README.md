@@ -16,13 +16,15 @@ Build with `mvn package`. To also create the runnable jar, use `mvn package asse
 
 ## Compact mode
 
-Turn on **Settings → Basic → Compact mode** for a small Minecraft overlay with up to five stronghold candidates. The angle turns green within 10° of the target, and a small lock appears when the calculator is frozen. Drag the panel to position it. Press **Esc** in the focused window or right-click and choose **Exit Compact mode** to return to your previous view. Dark and Light save the choice separately.
+Turn on **Settings → Basic → Compact mode** to show the most likely stronghold, with one line each for location, distance, angle and probability. The angle shifts from red through yellow to green and shows `≤10°` when you're within 10° of the target. A small lock appears when the calculator is frozen.
 
-If you use the OBS image overlay, the same image file follows the selected mode and your OBS auto-hide settings.
+Drag the panel to position it. Press **Esc** in the focused window or right-click and choose **Exit Compact mode** to return to your previous view. Dark and Light save the choice separately. The OBS image overlay uses the same layout and follows your OBS auto-hide settings.
 
-![Ninjabrain Dark in Compact mode with five candidates](docs/compact-mode/compact-5.png)
+The example measures **147 × 72 px** at 100% display scaling. The width adjusts to the displayed values.
 
-[Compare with the normal stacked Dark view](docs/compact-mode/dark-stacked.png).
+![Ninjabrain Dark in Compact mode with one stronghold candidate](docs/compact-mode/compact.png)
+
+[125% (185 × 90 px)](docs/compact-mode/compact-125.png) · [150% (212 × 108 px)](docs/compact-mode/compact-150.png) · [Normal stacked Dark view](docs/compact-mode/dark-stacked.png)
 
 Everything below is the original README.
 
