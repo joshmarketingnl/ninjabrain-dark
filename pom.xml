@@ -8,16 +8,21 @@
     <version>1.5.2</version>
     <name>Ninjabrain Focus</name>
     <description>An accurate stronghold calculator for Minecraft speedrunning.</description>
+    <properties>
+        <assembly.mainClass>ninjabrainbot.Main</assembly.mainClass>
+        <assembly.finalName>Ninjabrain-Focus-${project.version}</assembly.finalName>
+    </properties>
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
         <testSourceDirectory>src/test/java</testSourceDirectory>
         <plugins>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.7.1</version>
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>ninjabrainbot.Main</mainClass>
+                            <mainClass>${assembly.mainClass}</mainClass>
                         </manifest>
                         <manifestEntries>
                             <!-- No SplashScreen-Image: the JVM always centres the splash on the
@@ -28,7 +33,7 @@
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
-                    <finalName>Ninjabrain-Focus-1.5.2</finalName>
+                    <finalName>${assembly.finalName}</finalName>
                     <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
             </plugin>
@@ -48,6 +53,31 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>flierp</id>
+            <properties>
+                <assembly.mainClass>ninjabrainbot.FlierpLauncher</assembly.mainClass>
+                <assembly.finalName>Ninjabrain-Flierp-${project.version}</assembly.finalName>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>flierp-jar</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
     <dependencies>
         <dependency>
             <groupId>com.github.kwhat</groupId>

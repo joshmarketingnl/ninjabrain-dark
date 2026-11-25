@@ -9,7 +9,6 @@ import ninjabrainbot.gui.splash.Splash;
 import ninjabrainbot.io.ErrorHandler;
 import ninjabrainbot.io.KeyboardListener;
 import ninjabrainbot.io.preferences.NinjabrainBotPreferences;
-import ninjabrainbot.io.preferences.SavedPreferences;
 import ninjabrainbot.model.datastate.statistics.ApproximatedDensity;
 import ninjabrainbot.util.I18n;
 import ninjabrainbot.util.Logger;
@@ -19,22 +18,44 @@ public class Main {
 
 	public static final String VERSION = "1.5.2";
 
-	/**
-	 * Fork identity. One jar serves two apps: the shortcut passes
-	 * {@code -Dninjabrain.edition=dark} for the dark one. Everything that could collide with the
-	 * other edition, or with the original Ninjabrain Bot, is derived from this.
-	 */
-	public static final boolean DARK_EDITION = "dark".equalsIgnoreCase(System.getProperty("ninjabrain.edition", "light"));
+	private static final Edition EDITION = Edition.fromProperty();
+	private static final String EDITION_ID = EDITION.name().toLowerCase(Locale.ROOT);
 
-	public static final String APP_NAME = DARK_EDITION ? "Ninjabrain Dark" : "Ninjabrain Light";
-	public static final String PREFERENCES_NODE = DARK_EDITION ? "ninjabrainbot_dark" : "ninjabrainbot_light";
-	public static final String SAVE_STATE_FILE = DARK_EDITION ? "NinjabrainDark-save-state.txt" : "NinjabrainLight-save-state.txt";
-	public static final String OVERLAY_FILE = DARK_EDITION ? "nb-dark-overlay.png" : "nb-light-overlay.png";
-	public static final String ICON = DARK_EDITION ? "/icon_dark.png" : "/icon.png";
-	public static final int HTTP_PORT = DARK_EDITION ? 52535 : 52534;
+	public static final boolean FLIERP_EDITION = EDITION == Edition.FLIERP;
+	public static final String APP_NAME = "Ninjabrain " + EDITION.displayName;
+	public static final String PREFERENCES_NODE = "ninjabrainbot_" + EDITION_ID;
+	public static final String SAVE_STATE_FILE = "Ninjabrain" + EDITION.displayName + "-save-state.txt";
+	public static final String OVERLAY_FILE = "nb-" + EDITION_ID + "-overlay.png";
+	public static final String ICON = EDITION.icon;
+	public static final int HTTP_PORT = EDITION.httpPort;
+	public static final int DEFAULT_THEME_UID = EDITION.defaultThemeUid;
 
-	/** UID of the theme this edition starts with, see StandardThemes. */
-	public static final int DEFAULT_THEME_UID = DARK_EDITION ? 12 : 11;
+	private enum Edition {
+		LIGHT("Light", "/icon.png", 52534, 11),
+		DARK("Dark", "/icon_dark.png", 52535, 12),
+		FLIERP("Flierp", "/icon_dark.png", 52536, 12);
+
+		private final String displayName;
+		private final String icon;
+		private final int httpPort;
+		private final int defaultThemeUid;
+
+		Edition(String displayName, String icon, int httpPort, int defaultThemeUid) {
+			this.displayName = displayName;
+			this.icon = icon;
+			this.httpPort = httpPort;
+			this.defaultThemeUid = defaultThemeUid;
+		}
+
+		private static Edition fromProperty() {
+			String id = System.getProperty("ninjabrain.edition", "light");
+			for (Edition edition : values()) {
+				if (edition.name().equalsIgnoreCase(id))
+					return edition;
+			}
+			return LIGHT;
+		}
+	}
 
 	public static void main(String[] args) {
 		ErrorHandler errorHandler = new ErrorHandler();
@@ -51,10 +72,10 @@ public class Main {
 	 */
 	private static void writeStartupDiagnostics(NinjabrainBotPreferences preferences, ninjabrainbot.io.preferences.FilePreferences source) {
 		try {
-			java.io.File file = new java.io.File(System.getProperty("java.io.tmpdir"), "Ninjabrain-" + (DARK_EDITION ? "Dark" : "Light") + "-startup.log");
+			java.io.File file = new java.io.File(System.getProperty("java.io.tmpdir"), "Ninjabrain-" + EDITION.displayName + "-startup.log");
 			StringBuilder sb = new StringBuilder();
 			sb.append(new java.util.Date()).append(System.lineSeparator());
-			sb.append("edition        : ").append(DARK_EDITION ? "dark" : "light").append(System.lineSeparator());
+			sb.append("edition        : ").append(EDITION_ID).append(System.lineSeparator());
 			sb.append("settingsFile   : ").append(source.getFile()).append(System.lineSeparator());
 			sb.append("settingsCount  : ").append(source.size()).append(System.lineSeparator());
 			sb.append("jar            : ").append(Main.class.getProtectionDomain().getCodeSource().getLocation()).append(System.lineSeparator());

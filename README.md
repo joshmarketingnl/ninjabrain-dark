@@ -4,15 +4,23 @@
 
 Unzip it and double-click **Ninjabrain Dark.bat** (or **Ninjabrain Light.bat**). Needs Java 8 or newer; if nothing happens, install it from [java.com](https://www.java.com/download/).
 
-A personal fork of [Ninjabrain Bot](https://github.com/Ninjabrain1/Ninjabrain-Bot) 1.5.2 (GPL-3.0). One jar, two editions that run next to the original install:
+A personal fork of [Ninjabrain Bot](https://github.com/Ninjabrain1/Ninjabrain-Bot) 1.5.2 (GPL-3.0). The ZIP includes one jar shared by Dark and Light, which can run alongside the original install.
 
 - **Dark** (start with `-Dninjabrain.edition=dark`) and **Light** (default): own window title, settings file, save state, OBS overlay file, API port and icon.
 - Focus layouts with an angle colour gradient, optional frosted-glass translucency.
 - No splash screen (it always opened on the primary monitor and pulled you out of fullscreen).
 - Fix: a freshly started app no longer reads the F3+C already on the clipboard as the first throw.
-- Settings live in `%APPDATA%\Ninjabrain<Edition>\settings.properties` instead of `java.util.prefs`; on first start they are copied from the original app's settings.
+- Dark and Light store settings in `%APPDATA%\Ninjabrain<Edition>\settings.properties` and copy settings from the original app on first start.
 
 Build with `mvn package`. To also create the runnable jar, use `mvn package assembly:single`.
+
+## Flierp edition
+
+Download `Ninjabrain-Flierp-1.5.2.jar` and double-click it. Requires Java 8 or newer. [GitHub Releases](https://github.com/joshmarketingnl/ninjabrain-dark/releases)
+
+Flierp starts with a dark theme, Compact mode, OBS overlay, and Always on top enabled. It has its own settings and save state. Press **Esc** in the Flierp window to exit Compact mode.
+
+Build the standalone Flierp jar with `mvn -Pflierp package`. The jar is written to `target/`.
 
 ## Compact mode
 

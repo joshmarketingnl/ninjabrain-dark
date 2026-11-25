@@ -2,6 +2,7 @@ package ninjabrainbot.io.preferences;
 
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import com.sun.jna.Platform;
+import ninjabrainbot.Main;
 import ninjabrainbot.io.KeyConverter;
 import ninjabrainbot.io.preferences.enums.AllAdvancementsToggleType;
 import ninjabrainbot.io.preferences.enums.AngleAdjustmentDisplayType;
@@ -92,7 +93,7 @@ public class NinjabrainBotPreferences {
 		// Integer
 		windowX = new IntPreference("window_x", 100, source);
 		windowY = new IntPreference("window_y", 100, source);
-		theme = new IntPreference("theme", ninjabrainbot.Main.DEFAULT_THEME_UID, source);
+		theme = new IntPreference("theme", Main.DEFAULT_THEME_UID, source);
 		settingsVersion = new IntPreference("settings_version", 0, source);
 		// Hotkey
 		hotkeyIncrement = new HotkeyPreference("hotkey_increment", source);
@@ -124,7 +125,7 @@ public class NinjabrainBotPreferences {
 		translucent = new BooleanPreference("translucent", false, source);
 		blurredBackground = new BooleanPreference("blurred_background", false, source);
 		showThrowCoordinates = new BooleanPreference("show_throw_coordinates", false, source);
-		compactMode = new BooleanPreference("compact_mode", false, source);
+		compactMode = new BooleanPreference("compact_mode", Main.FLIERP_EDITION, source);
 		windowOpacity = new FloatPreference("window_opacity", 75f, 20f, 100f, source);
 		focusTextScale = new FloatPreference("focus_text_scale", 190f, 100f, 300f, source);
 		focusLayout = new MultipleChoicePreference<>("focus_layout", FocusLayoutType.GRID, new int[] { 0, 1, 2 }, new FocusLayoutType[] { FocusLayoutType.ROW, FocusLayoutType.GRID, FocusLayoutType.STACKED }, source);
@@ -140,7 +141,7 @@ public class NinjabrainBotPreferences {
 		useAltStd = new BooleanPreference("use_alt_std", false, source);
 		colorCodeNegativeCoords = new BooleanPreference("color_negative_coords", false, source);
 		usePreciseAngle = new BooleanPreference("use_precise_angle", false, source);
-		useOverlay = new BooleanPreference("use_obs_overlay", false, source);
+		useOverlay = new BooleanPreference("use_obs_overlay", Main.FLIERP_EDITION, source);
 		saveState = new BooleanPreference("save_state", true, source);
 		enableHttpServer = new BooleanPreference("enable_http_server", false, source);
 		overlayAutoHide = new BooleanPreference("overlay_auto_hide", false, source);

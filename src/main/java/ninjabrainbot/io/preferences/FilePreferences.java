@@ -21,8 +21,8 @@ import ninjabrainbot.util.Logger;
  * spot from the interface and it cost a whole evening. A file we open ourselves either works or
  * throws.
  * <p>
- * The first time the file is created it is seeded from the original Ninjabrain Bot's registry
- * node, so a new copy starts with the same calibration rather than factory defaults.
+ * On first start, Dark and Light inherit calibration and other settings from the original
+ * Ninjabrain Bot. Flierp starts with its own defaults.
  */
 public class FilePreferences implements IPreferenceSource {
 
@@ -43,8 +43,10 @@ public class FilePreferences implements IPreferenceSource {
 		load();
 		// Not isEmpty: I18n writes the language into the file before this runs.
 		if (properties.getProperty("settings_version") == null) {
-			int inherited = inheritFromOriginal();
-			Logger.log("No settings file yet, inherited " + inherited + " settings from the original Ninjabrain Bot.");
+			if (!Main.FLIERP_EDITION) {
+				int inherited = inheritFromOriginal();
+				Logger.log("No settings file yet, inherited " + inherited + " settings from the original Ninjabrain Bot.");
+			}
 			save();
 		}
 	}
