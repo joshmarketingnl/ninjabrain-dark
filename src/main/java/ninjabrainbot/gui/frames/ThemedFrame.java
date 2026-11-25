@@ -1,8 +1,12 @@
 package ninjabrainbot.gui.frames;
 
 import java.awt.Color;
+import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.Insets;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.net.URL;
 
 import javax.swing.BoxLayout;
@@ -107,6 +111,13 @@ public abstract class ThemedFrame extends JFrame implements IDisposable {
 			}
 		}
 		setLocation(100, 100);
+	}
+
+	static Rectangle getWorkArea(GraphicsConfiguration configuration) {
+		Rectangle bounds = configuration.getBounds();
+		Insets insets = Toolkit.getDefaultToolkit().getScreenInsets(configuration);
+		return new Rectangle(bounds.x + insets.left, bounds.y + insets.top,
+				bounds.width - insets.left - insets.right, bounds.height - insets.top - insets.bottom);
 	}
 
 	@Override

@@ -1,6 +1,9 @@
 package ninjabrainbot.gui.frames;
 
+import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsDevice.WindowTranslucency;
 import java.awt.GraphicsEnvironment;
@@ -24,6 +27,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
@@ -36,6 +40,7 @@ import ninjabrainbot.gui.buttons.NotificationsButton;
 import ninjabrainbot.gui.buttons.TitleBarButton;
 import ninjabrainbot.gui.components.labels.ThemedIcon;
 import ninjabrainbot.gui.components.labels.ThemedLabel;
+import ninjabrainbot.gui.components.panels.ThemedPanel;
 import ninjabrainbot.gui.mainwindow.boateye.BoatIcon;
 import ninjabrainbot.gui.mainwindow.boateye.Mod360Icon;
 import ninjabrainbot.gui.mainwindow.eyethrows.EnderEyePanel;
@@ -77,6 +82,7 @@ public class NinjabrainBotFrame extends ThemedFrame implements IDisposable {
 	private MainButtonPanel mainButtonPanel;
 	private EnderEyePanel enderEyePanel;
 	private CompactTriangulationPanel compactPanel;
+	private JPanel compactWindow;
 
 	private static final String TITLE_TEXT = Main.APP_NAME + " ";
 	private static final String VERSION_TEXT = "v" + Main.VERSION;
@@ -88,7 +94,6 @@ public class NinjabrainBotFrame extends ThemedFrame implements IDisposable {
 		this.preferences = preferences;
 		this.styleManager = styleManager;
 		Profiler.start("NinjabrainBotFrame");
-		setLocation(preferences.windowX.get(), preferences.windowY.get()); // Set window position
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		updateWindowTranslucency(false);
 		setAppIcon();
@@ -124,7 +129,32 @@ public class NinjabrainBotFrame extends ThemedFrame implements IDisposable {
 	}
 
 	public boolean isIdle() {
-		return compactPanel.isVisible() ? compactPanel.isIdle() : mainTextArea.isIdle();
+		return compactWindow.isVisible() ? compactPanel.isIdle() : mainTextArea.isIdle();
+	}
+
+	public Dimension getOverlaySize() {
+		return compactWindow.isVisible() ? compactPanel.getPreferredSize() : getSize();
+	}
+
+	public void paintOverlay(Graphics graphics) {
+		if (compactWindow.isVisible())
+			compactPanel.paint(graphics);
+		else
+			paint(graphics);
+	}
+
+	public void placeForStartup() {
+		if (preferences.hasSavedWindowPosition()) {
+			setLocation(preferences.windowX.get(), preferences.windowY.get());
+			checkIfOffScreen();
+			return;
+		}
+
+		Rectangle screen = getWorkArea(GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration());
+		int margin = 16;
+		int x = Math.max(screen.x, screen.x + screen.width - getWidth() - margin);
+		int y = Math.max(screen.y, Math.min(screen.y + margin, screen.y + screen.height - getHeight()));
+		setLocation(x, y);
 	}
 
 	private void setupSubscriptions(StyleManager styleManager, IDataState dataState) {
@@ -195,13 +225,32 @@ public class NinjabrainBotFrame extends ThemedFrame implements IDisposable {
 		compactPanel = new CompactTriangulationPanel(styleManager, preferences);
 		compactPanel.setLocked(dataState.locked().get());
 		updateCompactResult(dataState);
-		add(compactPanel);
+		compactWindow = new JPanel(new BorderLayout());
+		compactWindow.setAlignmentX(0);
+		compactWindow.setOpaque(false);
+		compactWindow.add(createCompactHeader(styleManager), BorderLayout.NORTH);
+		compactWindow.add(compactPanel, BorderLayout.CENTER);
+		add(compactWindow);
 		installCompactControls();
-		compactPanel.addPropertyChangeListener("preferredSize", event -> {
-			if (compactPanel.isVisible())
-				updateSize(styleManager);
-		});
 		showCompactMode();
+	}
+
+	private JPanel createCompactHeader(StyleManager styleManager) {
+		ThemedPanel header = new ThemedPanel(styleManager);
+		header.setLayout(new BorderLayout());
+		header.setBackgroundColor(styleManager.currentTheme.COLOR_STRONGEST);
+		header.setInheritsPopupMenu(true);
+
+		Image gear = new ImageIcon(Main.class.getResource("/settings_icon.png")).getImage();
+		FlatButton button = new TitleBarButton(styleManager, new ImageIcon(gear.getScaledInstance(12, 12, Image.SCALE_SMOOTH)));
+		button.setPreferredSize(new Dimension(20, 16));
+		button.setToolTipText(I18n.get("settings"));
+		button.getAccessibleContext().setAccessibleName(I18n.get("settings"));
+		button.setFocusable(true);
+		button.setInheritsPopupMenu(true);
+		button.addActionListener(event -> settingsButton.doClick(0));
+		header.add(button, BorderLayout.EAST);
+		return header;
 	}
 
 	private void updateCompactResult(IDataState dataState) {
@@ -215,15 +264,15 @@ public class NinjabrainBotFrame extends ThemedFrame implements IDisposable {
 		informationTextPanel.setVisible(!compact);
 		mainButtonPanel.setVisible(!compact);
 		enderEyePanel.setVisible(!compact);
-		compactPanel.setVisible(compact);
+		compactWindow.setVisible(compact);
 	}
 
 	private void resizeForMode() {
-		Rectangle monitor = compactPanel.isShowing() ? getGraphicsConfiguration().getBounds() : null;
+		Rectangle monitor = compactWindow.isShowing() ? getWorkArea(getGraphicsConfiguration()) : null;
 		Rectangle previousBounds = getBounds();
 		showCompactMode();
 		updateSize(styleManager);
-		if (!compactPanel.isVisible() && monitor != null && monitor.intersects(previousBounds)) {
+		if (!compactWindow.isVisible() && monitor != null && monitor.intersects(previousBounds)) {
 			// A compact overlay near the screen edge can leave the restored title buttons off screen.
 			int x = Math.max(monitor.x, Math.min(getX(), monitor.x + monitor.width - getWidth()));
 			int y = Math.max(monitor.y, Math.min(getY(), monitor.y + monitor.height - getHeight()));
@@ -236,9 +285,10 @@ public class NinjabrainBotFrame extends ThemedFrame implements IDisposable {
 		menu.setLightWeightPopupEnabled(false);
 		JMenuItem exitCompact = menu.add(I18n.get("compact.exit"));
 		exitCompact.addActionListener(event -> preferences.compactMode.set(false));
-		compactPanel.setComponentPopupMenu(menu);
-		compactPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "exitCompact");
-		compactPanel.getActionMap().put("exitCompact", new AbstractAction() {
+		compactWindow.setComponentPopupMenu(menu);
+		compactPanel.setInheritsPopupMenu(true);
+		compactWindow.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "exitCompact");
+		compactWindow.getActionMap().put("exitCompact", new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
 				preferences.compactMode.set(false);
@@ -265,8 +315,9 @@ public class NinjabrainBotFrame extends ThemedFrame implements IDisposable {
 					setLocation(event.getXOnScreen() - offset.x, event.getYOnScreen() - offset.y);
 			}
 		};
-		compactPanel.addMouseListener(dragWindow);
-		compactPanel.addMouseMotionListener(dragWindow);
+		compactWindow.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+		compactWindow.addMouseListener(dragWindow);
+		compactWindow.addMouseMotionListener(dragWindow);
 	}
 
 	@Override
@@ -358,10 +409,10 @@ public class NinjabrainBotFrame extends ThemedFrame implements IDisposable {
 	}
 
 	private void updateSize(StyleManager styleManager) {
-		if (compactPanel == null)
+		if (compactWindow == null)
 			return;
-		boolean compact = compactPanel.isVisible();
-		Dimension size = compact ? compactPanel.getPreferredSize() : new Dimension(styleManager.size.WIDTH + getExtraWidth(styleManager), getPreferredSize().height);
+		boolean compact = compactWindow.isVisible();
+		Dimension size = compact ? compactWindow.getPreferredSize() : new Dimension(styleManager.size.WIDTH + getExtraWidth(styleManager), getPreferredSize().height);
 		int rounding = compact ? 4 : styleManager.size.WINDOW_ROUNDING;
 		setSize(size);
 		setShape(new RoundRectangle2D.Double(0, 0, size.width, size.height, rounding, rounding));

@@ -1,5 +1,6 @@
 package ninjabrainbot.io.overlay;
 
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
@@ -105,8 +106,7 @@ public class OBSOverlay implements IDisposable {
 
 	private void clear() {
 		if (preferences.useOverlay.get()) {
-			BufferedImage img = new BufferedImage(ninjabrainBotFrame.getWidth(), ninjabrainBotFrame.getHeight(), BufferedImage.TYPE_INT_ARGB);
-			imageWriter.write(img);
+			imageWriter.write(createImage());
 			if (preferences.overlayAutoHide.get()) {
 				overlayClearTimer.stop();
 			}
@@ -120,13 +120,13 @@ public class OBSOverlay implements IDisposable {
 
 	private void drawAndWriteToFile() {
 		if (preferences.useOverlay.get()) {
-			BufferedImage img = new BufferedImage(ninjabrainBotFrame.getWidth(), ninjabrainBotFrame.getHeight(), BufferedImage.TYPE_INT_ARGB);
+			BufferedImage img = createImage();
 			boolean hideBecauseLocked = preferences.overlayHideWhenLocked.get() && calculatorLocked.get();
 			if (!ninjabrainBotFrame.isIdle() && !hideBecauseLocked) {
 				Graphics2D graphics = img.createGraphics();
 				Translucency.suspend(true);
 				try {
-					ninjabrainBotFrame.paint(graphics);
+					ninjabrainBotFrame.paintOverlay(graphics);
 				} finally {
 					Translucency.suspend(false);
 					graphics.dispose();
@@ -135,6 +135,11 @@ public class OBSOverlay implements IDisposable {
 			}
 			imageWriter.write(img);
 		}
+	}
+
+	private BufferedImage createImage() {
+		Dimension size = ninjabrainBotFrame.getOverlaySize();
+		return new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
 	}
 
 	private void resetClearTimer() {

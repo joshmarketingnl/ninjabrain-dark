@@ -31,7 +31,7 @@ public class FilePreferences implements IPreferenceSource {
 
 	/** Settings that describe this copy rather than how it calculates. */
 	private static final java.util.List<String> NOT_INHERITED = java.util.Arrays.asList(
-			"theme", "custom_themes", "custom_themes_names",
+			"theme", "custom_themes", "custom_themes_names", "window_x", "window_y",
 			"translucent", "blurred_background",
 			"view", "focus_layout", "focus_text_scale", "show_throw_coordinates", "compact_mode");
 
@@ -102,36 +102,10 @@ public class FilePreferences implements IPreferenceSource {
 				properties.setProperty(key, value);
 				copied++;
 			}
-			nudgeWindowFullyOntoItsMonitor();
 			return copied;
 		} catch (Exception e) {
 			Logger.log("Could not inherit settings from the original Ninjabrain Bot: " + e);
 			return 0;
-		}
-	}
-
-	/** Roughly the largest the window gets, used to keep the inherited position on one monitor. */
-	private static final int WINDOW_WIDTH = 540;
-	private static final int WINDOW_HEIGHT = 340;
-
-	/**
-	 * The original window may straddle two monitors. A position that is not wholly on one screen
-	 * makes the app drop the window in the middle of the primary one, so slide it back in.
-	 */
-	private void nudgeWindowFullyOntoItsMonitor() {
-		try {
-			int x = Integer.parseInt(properties.getProperty("window_x", "no"));
-			int y = Integer.parseInt(properties.getProperty("window_y", "no"));
-			for (java.awt.GraphicsDevice device : java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()) {
-				java.awt.Rectangle screen = device.getDefaultConfiguration().getBounds();
-				if (!screen.contains(x, y))
-					continue;
-				properties.setProperty("window_x", Integer.toString(Math.max(screen.x, Math.min(x, screen.x + screen.width - WINDOW_WIDTH))));
-				properties.setProperty("window_y", Integer.toString(Math.max(screen.y, Math.min(y, screen.y + screen.height - WINDOW_HEIGHT))));
-				return;
-			}
-		} catch (RuntimeException ignored) {
-			// No usable position inherited, the app will pick its own.
 		}
 	}
 

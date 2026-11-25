@@ -2,6 +2,7 @@ package ninjabrainbot.gui.mainwindow.triangulation;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -22,6 +23,7 @@ import ninjabrainbot.model.datastate.calculator.ICalculatorResult;
 import ninjabrainbot.model.datastate.common.IPlayerPosition;
 import ninjabrainbot.model.datastate.stronghold.Chunk;
 import ninjabrainbot.model.datastate.stronghold.ChunkPrediction;
+import ninjabrainbot.util.I18n;
 import ninjabrainbot.util.TestUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -69,30 +71,58 @@ class CompactTriangulationPanelTests {
 
 		SwingUtilities.invokeAndWait(() -> {
 			assertTrue(panel.isIdle());
+			assertEquals(new Dimension(147, 72), panel.getPreferredSize());
+			assertEquals(Arrays.asList(I18n.get("waiting_f3c"), I18n.get("compact.drag_hint")),
+					visibleLabels(panel).stream().map(JLabel::getText).collect(Collectors.toList()));
 			panel.setResult(result);
 			assertFalse(panel.isIdle());
+			assertEquals(new Dimension(147, 72), panel.getPreferredSize());
 			assertFalse(isLockVisible());
 			panel.setLocked(true);
 			assertTrue(isLockVisible());
 
 			panel.setSize(panel.getPreferredSize());
-			panel.doLayout();
+			layout(panel);
 			List<JLabel> values = visibleValues();
 			assertEquals(Arrays.asList("(4, 164)", best.formatDistanceInPlayersDimension(),
 					best.formatTravelAngle(false) + "\u00B0 \u226410\u00B0", best.formatCertainty()),
 					values.stream().map(JLabel::getText).collect(Collectors.toList()));
 			int previousY = -1;
 			for (JLabel value : values) {
-				assertTrue(value.getY() > previousY);
+				int y = SwingUtilities.convertPoint(value, 0, 0, panel).y;
+				assertTrue(y > previousY);
 				assertTrue(value.getWidth() >= value.getPreferredSize().width);
 				assertTrue(value.getHeight() >= value.getPreferredSize().height);
-				previousY = value.getY();
+				previousY = y;
 			}
 
 			panel.setResult(new CalculatorResult());
 			assertTrue(panel.isIdle());
 			assertTrue(visibleValues().isEmpty());
+			assertEquals(new Dimension(147, 72), panel.getPreferredSize());
 		});
+	}
+
+	@Test
+	void fitsLongColorCodedCoordinatesWithTheLockVisible() throws Exception {
+		ChunkPrediction far = new ChunkPrediction(new Chunk(-1875000, -1875000, 1), position, McVersion.PRE_119);
+		try {
+			ICalculatorResult result = resultWithBestPrediction();
+			when(result.getBestPrediction()).thenReturn(far);
+			SwingUtilities.invokeAndWait(() -> {
+				preferences.colorCodeNegativeCoords.set(true);
+				panel.setResult(result);
+				panel.setLocked(true);
+				panel.setSize(panel.getPreferredSize());
+				layout(panel);
+				JLabel coordinates = visibleValues().get(0);
+				assertTrue(coordinates.getText().contains("-29999996"));
+				assertTrue(coordinates.getWidth() >= coordinates.getPreferredSize().width);
+				assertEquals(new Dimension(147, 72), panel.getPreferredSize());
+			});
+		} finally {
+			far.dispose();
+		}
 	}
 
 	@Test
@@ -130,8 +160,16 @@ class CompactTriangulationPanelTests {
 
 	private List<JLabel> visibleValues() {
 		return visibleLabels(panel).stream()
-				.filter(label -> label.getLabelFor() == null && !(label instanceof ThemedIcon))
+				.filter(label -> label.getHorizontalAlignment() == JLabel.RIGHT)
 				.collect(Collectors.toList());
+	}
+
+	private static void layout(Container container) {
+		container.doLayout();
+		for (Component child : container.getComponents()) {
+			if (child instanceof Container)
+				layout((Container) child);
+		}
 	}
 
 	private boolean isLockVisible() {

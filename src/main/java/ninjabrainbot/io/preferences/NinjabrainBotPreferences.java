@@ -17,6 +17,8 @@ import ninjabrainbot.util.Assert;
 
 public class NinjabrainBotPreferences {
 
+	private static final int UNSET_WINDOW_COORDINATE = Integer.MIN_VALUE;
+
 	final IPreferenceSource source;
 
 	public final IntPreference windowX;
@@ -88,11 +90,15 @@ public class NinjabrainBotPreferences {
 	public final MultipleChoicePreference<AngleAdjustmentType> angleAdjustmentType;
 	public final MultipleChoicePreference<AngleAdjustmentDisplayType> angleAdjustmentDisplayType;
 
+	public boolean hasSavedWindowPosition() {
+		return windowX.get() != UNSET_WINDOW_COORDINATE && windowY.get() != UNSET_WINDOW_COORDINATE;
+	}
+
 	public NinjabrainBotPreferences(IPreferenceSource source) {
 		this.source = source;
 		// Integer
-		windowX = new IntPreference("window_x", 100, source);
-		windowY = new IntPreference("window_y", 100, source);
+		windowX = new IntPreference("window_x", UNSET_WINDOW_COORDINATE, source);
+		windowY = new IntPreference("window_y", UNSET_WINDOW_COORDINATE, source);
 		theme = new IntPreference("theme", Main.DEFAULT_THEME_UID, source);
 		settingsVersion = new IntPreference("settings_version", 0, source);
 		// Hotkey

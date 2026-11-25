@@ -1,5 +1,7 @@
 package ninjabrainbot.gui;
 
+import javax.swing.SwingUtilities;
+
 import ninjabrainbot.event.DisposeHandler;
 import ninjabrainbot.Main;
 import ninjabrainbot.gui.frames.NinjabrainBotFrame;
@@ -145,17 +147,6 @@ public class GUI {
 		Profiler.stopAndStart("Create settings window");
 		ninjabrainBotFrame.getSettingsButton().addActionListener(__ -> getOrCreateOptionsFrame().toggleWindow(ninjabrainBotFrame));
 
-		// -Dninjabrain.debug.openSettings=<tabIndex> opens the settings window at startup, so the
-		// panels can be inspected without driving the mouse.
-		String debugTab = System.getProperty("ninjabrain.debug.openSettings");
-		if (debugTab != null) {
-			javax.swing.SwingUtilities.invokeLater(() -> {
-				OptionsFrame options = getOrCreateOptionsFrame();
-				options.toggleWindow(ninjabrainBotFrame);
-				options.selectTab(debugTab);
-			});
-		}
-
 		Progress.setTask("Settings fonts and colors", 0.99f);
 		Profiler.stopAndStart("Init fonts, colors, bounds");
 		styleManager.init();
@@ -178,11 +169,25 @@ public class GUI {
 
 		autoResetTimer = new AutoResetTimer(dataState, domainModel, actionExecutor, preferences);
 
-		obsOverlay = new OBSOverlay(ninjabrainBotFrame, preferences, dataState, domainModel, new NinjabrainBotOverlayImageWriter(), 100);
 		ninjabrainBotHttpServer = new NinjabrainBotHttpServer(dataState, domainModel, informationMessageList, preferences);
 
-		ninjabrainBotFrame.checkIfOffScreen();
+		boolean firstLaunch = !preferences.hasSavedWindowPosition();
+		ninjabrainBotFrame.placeForStartup();
 		ninjabrainBotFrame.setVisible(true);
+		obsOverlay = new OBSOverlay(ninjabrainBotFrame, preferences, dataState, domainModel, new NinjabrainBotOverlayImageWriter(), 100);
+
+		// -Dninjabrain.debug.openSettings=<tabIndex> opens a specific Settings tab for inspection.
+		String debugTab = System.getProperty("ninjabrain.debug.openSettings");
+		if (firstLaunch || debugTab != null) {
+			SwingUtilities.invokeLater(() -> {
+				OptionsFrame options = getOrCreateOptionsFrame();
+				if (debugTab != null)
+					options.selectTab(debugTab);
+				options.showNextTo(ninjabrainBotFrame);
+				if (firstLaunch)
+					saveWindowPosition();
+			});
+		}
 
 		Runtime.getRuntime().addShutdownHook(onShutdown());
 		Profiler.stop();
@@ -196,12 +201,20 @@ public class GUI {
 		return optionsFrame;
 	}
 
+	private void saveWindowPosition() {
+		int x = ninjabrainBotFrame.getX();
+		int y = ninjabrainBotFrame.getY();
+		if (x != preferences.windowX.get())
+			preferences.windowX.set(x);
+		if (y != preferences.windowY.get())
+			preferences.windowY.set(y);
+	}
+
 	private Thread onShutdown() {
 		return new Thread("Shutdown") {
 			@Override
 			public void run() {
-				preferences.windowX.set(ninjabrainBotFrame.getX());
-				preferences.windowY.set(ninjabrainBotFrame.getY());
+				saveWindowPosition();
 				domainModelImportExportService.onShutdown();
 				disposeHandler.dispose();
 				obsOverlay.dispose();

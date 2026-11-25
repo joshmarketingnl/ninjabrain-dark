@@ -29,12 +29,13 @@ public class BasicOptionsPanel extends JPanel {
 		add(column2);
 
 		// Column 1
+		column1.add(new CheckboxPanel(styleManager, I18n.get("settings.compact_mode"), preferences.compactMode));
+		column1.add(new CheckboxPanel(styleManager, I18n.get("settings.always_on_top"), preferences.alwaysOnTop));
+		column1.add(new CheckboxPanel(styleManager, I18n.get("settings.overlay"), preferences.useOverlay));
 		column1.add(new CheckboxPanel(styleManager, I18n.get("settings.show_nether_coordinates"), preferences.showNetherCoords));
 		column1.add(new CheckboxPanel(styleManager, I18n.get("settings.auto_reset"), preferences.autoReset));
 		if (activeInstanceProvider.supportsReadingActiveMinecraftWorld())
 			column1.add(new CheckboxPanel(styleManager, I18n.get("settings.auto_reset_when_world_is_reset"), preferences.autoResetWhenChangingInstance));
-		column1.add(new CheckboxPanel(styleManager, I18n.get("settings.always_on_top"), preferences.alwaysOnTop));
-		column1.add(new CheckboxPanel(styleManager, I18n.get("settings.compact_mode"), preferences.compactMode));
 		column1.add(new CheckboxPanel(styleManager, I18n.get("settings.translucent_window"), preferences.translucent));
 		column1.add(new CheckboxPanel(styleManager, I18n.get("settings.blurred_background"), preferences.blurredBackground));
 		column1.add(new CheckboxPanel(styleManager, I18n.get("settings.show_throw_coordinates"), preferences.showThrowCoordinates));

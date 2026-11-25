@@ -46,6 +46,7 @@ public class FlierpPreferencesTests {
 		FilePreferences source = new FilePreferences();
 		assertEquals(Paths.get(args[0], "NinjabrainFlierp", "settings.properties"), source.getFile());
 		NinjabrainBotPreferences preferences = new NinjabrainBotPreferences(source);
+		assertFalse(preferences.hasSavedWindowPosition());
 		assertEquals(12, preferences.theme.get()); // Original dark
 		assertTrue(preferences.compactMode.get());
 		assertTrue(preferences.useOverlay.get());
@@ -55,8 +56,14 @@ public class FlierpPreferencesTests {
 		preferences.compactMode.set(false);
 		preferences.useOverlay.set(false);
 		preferences.alwaysOnTop.set(false);
+		preferences.windowX.set(100);
+		assertFalse(preferences.hasSavedWindowPosition());
+		preferences.windowY.set(100);
 
 		NinjabrainBotPreferences reloaded = new NinjabrainBotPreferences(new FilePreferences());
+		assertTrue(reloaded.hasSavedWindowPosition());
+		assertEquals(100, reloaded.windowX.get());
+		assertEquals(100, reloaded.windowY.get());
 		assertEquals(11, reloaded.theme.get());
 		assertFalse(reloaded.compactMode.get());
 		assertFalse(reloaded.useOverlay.get());

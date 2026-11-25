@@ -1,6 +1,7 @@
 package ninjabrainbot.io.preferences;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -54,6 +55,7 @@ public class CompactModePreferencesTests {
 
 	public static void main(String[] args) {
 		NinjabrainBotPreferences preferences = new NinjabrainBotPreferences(new FilePreferences());
+		assertFalse(preferences.hasSavedWindowPosition());
 		assertEquals(Boolean.parseBoolean(args[0]), preferences.compactMode.get());
 		boolean newValue = Boolean.parseBoolean(args[1]);
 		preferences.compactMode.set(newValue);

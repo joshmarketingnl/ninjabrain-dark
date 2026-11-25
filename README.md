@@ -10,7 +10,7 @@ A personal fork of [Ninjabrain Bot](https://github.com/Ninjabrain1/Ninjabrain-Bo
 - Focus layouts with an angle colour gradient, optional frosted-glass translucency.
 - No splash screen (it always opened on the primary monitor and pulled you out of fullscreen).
 - Fix: a freshly started app no longer reads the F3+C already on the clipboard as the first throw.
-- Dark and Light store settings in `%APPDATA%\Ninjabrain<Edition>\settings.properties` and copy settings from the original app on first start.
+- Dark and Light store their settings and window position in `%APPDATA%\Ninjabrain<Edition>\settings.properties`. On first start they copy calibration and other compatible settings from the original app.
 
 Build with `mvn package`. To also create the runnable jar, use `mvn package assembly:single`.
 
@@ -18,21 +18,24 @@ Build with `mvn package`. To also create the runnable jar, use `mvn package asse
 
 Download `Ninjabrain-Flierp-1.5.2.jar` and double-click it. Requires Java 8 or newer. [GitHub Releases](https://github.com/joshmarketingnl/ninjabrain-dark/releases)
 
-Flierp starts with a dark theme, Compact mode, OBS overlay, and Always on top enabled. It has its own settings and save state. Press **Esc** in the Flierp window to exit Compact mode.
+Flierp starts with a dark theme, Compact mode, OBS overlay, and Always on top enabled. It has its own settings and save state.
 
 Build the standalone Flierp jar with `mvn -Pflierp package`. The jar is written to `target/`.
 
 ## Compact mode
 
+On the first launch of each edition, the main window appears near the top-right of the primary display. **Settings → Basic** opens alongside it with **Compact mode**, **Always on top**, and **OBS overlay** at the top. Later launches use the saved position.
+
 Turn on **Settings → Basic → Compact mode** to show the most likely stronghold, with one line each for location, distance, angle and probability. The angle shifts from red through yellow to green and shows `≤10°` when you're within 10° of the target. A small lock appears when the calculator is frozen.
 
-Drag the panel to position it. Press **Esc** in the focused window or right-click and choose **Exit Compact mode** to return to your previous view. Dark and Light save the choice separately. The OBS image overlay uses the same layout and follows your OBS auto-hide settings.
+Drag the panel to position it and click the gear to open **Settings**. Press **Esc** in the focused window or right-click and choose **Exit Compact mode** to return to your previous view. Each edition saves its own Compact setting.
 
-The example measures **147 × 72 px** at 100% display scaling. The width adjusts to the displayed values.
+The window measures **147 × 88 px** at 100% display scaling, both while waiting for F3+C and when showing a result. The four-line result takes **147 × 72 px** and the gear adds a **16 px** header. The OBS image shows the result and follows your OBS auto-hide settings.
 
+![Compact mode waiting for F3+C](docs/compact-mode/compact-idle.png)
 ![Ninjabrain Dark in Compact mode with one stronghold candidate](docs/compact-mode/compact.png)
 
-[125% (185 × 90 px)](docs/compact-mode/compact-125.png) · [150% (212 × 108 px)](docs/compact-mode/compact-150.png) · [Normal stacked Dark view](docs/compact-mode/dark-stacked.png)
+[Compact settings gear](docs/compact-mode/compact-settings.png) · [125% (184 × 110 px)](docs/compact-mode/compact-125.png) · [150% (221 × 132 px)](docs/compact-mode/compact-150.png) · [Normal stacked Dark view](docs/compact-mode/dark-stacked.png)
 
 Everything below is the original README.
 

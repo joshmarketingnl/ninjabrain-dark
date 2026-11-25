@@ -91,13 +91,26 @@ public class OptionsFrame extends ThemedFrame {
 	}
 
 	public void toggleWindow(JFrame parent) {
-		if (isVisible()) {
+		if (isVisible())
 			close();
-		} else {
-			setVisible(true);
-			Rectangle bounds = parent.getBounds();
-			setLocation(bounds.x + 40, bounds.y + 30);
-		}
+		else
+			showNextTo(parent);
+	}
+
+	public void showNextTo(JFrame parent) {
+		if (isVisible())
+			return;
+
+		Rectangle screen = getWorkArea(parent.getGraphicsConfiguration());
+		Rectangle bounds = parent.getBounds();
+		int gap = 12;
+		int x = bounds.x - getWidth() - gap;
+		if (x < screen.x)
+			x = bounds.x + bounds.width + gap;
+		x = Math.max(screen.x, Math.min(x, screen.x + screen.width - getWidth()));
+		int y = Math.max(screen.y, Math.min(bounds.y, screen.y + screen.height - getHeight()));
+		setLocation(x, y);
+		setVisible(true);
 	}
 
 }
