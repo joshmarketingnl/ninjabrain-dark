@@ -1,19 +1,31 @@
 package ninjabrainbot.gui.frames;
 
+import java.awt.Dimension;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsDevice.WindowTranslucency;
 import java.awt.GraphicsEnvironment;
-import java.awt.geom.RoundRectangle2D;
 import java.awt.Image;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.geom.RoundRectangle2D;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Objects;
 
+import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 import com.sun.jna.Platform;
@@ -27,10 +39,11 @@ import ninjabrainbot.gui.components.labels.ThemedLabel;
 import ninjabrainbot.gui.mainwindow.boateye.BoatIcon;
 import ninjabrainbot.gui.mainwindow.boateye.Mod360Icon;
 import ninjabrainbot.gui.mainwindow.eyethrows.EnderEyePanel;
-import ninjabrainbot.gui.mainwindow.triangulation.FocusTriangulationPanel;
 import ninjabrainbot.gui.mainwindow.information.InformationListPanel;
 import ninjabrainbot.gui.mainwindow.main.MainButtonPanel;
 import ninjabrainbot.gui.mainwindow.main.MainTextArea;
+import ninjabrainbot.gui.mainwindow.triangulation.CompactTriangulationPanel;
+import ninjabrainbot.gui.mainwindow.triangulation.FocusTriangulationPanel;
 import ninjabrainbot.gui.style.SizePreference;
 import ninjabrainbot.gui.style.StyleManager;
 import ninjabrainbot.gui.style.Translucency;
@@ -39,6 +52,7 @@ import ninjabrainbot.io.preferences.enums.FocusLayoutType;
 import ninjabrainbot.io.preferences.enums.MainViewType;
 import ninjabrainbot.io.updatechecker.IUpdateChecker;
 import ninjabrainbot.model.datastate.IDataState;
+import ninjabrainbot.model.datastate.common.ResultType;
 import ninjabrainbot.model.information.InformationMessageList;
 import ninjabrainbot.model.input.IButtonInputHandler;
 import ninjabrainbot.util.I18n;
@@ -60,7 +74,9 @@ public class NinjabrainBotFrame extends ThemedFrame implements IDisposable {
 
 	private MainTextArea mainTextArea;
 	private InformationListPanel informationTextPanel;
+	private MainButtonPanel mainButtonPanel;
 	private EnderEyePanel enderEyePanel;
+	private CompactTriangulationPanel compactPanel;
 
 	private static final String TITLE_TEXT = Main.APP_NAME + " ";
 	private static final String VERSION_TEXT = "v" + Main.VERSION;
@@ -100,9 +116,7 @@ public class NinjabrainBotFrame extends ThemedFrame implements IDisposable {
 		int versionwidth = styleManager.getTextWidth(VERSION_TEXT, styleManager.fontSize(styleManager.size.TEXT_SIZE_TITLE_SMALL, false));
 		lockIcon.setBounds(titlewidth + versionwidth + (titlebarHeight - styleManager.size.TEXT_SIZE_TITLE_SMALL) / 2, 0, titlebarHeight, titlebarHeight);
 		// Frame size
-		int extraWidth = getExtraWidth(styleManager);
-		setSize(styleManager.size.WIDTH + extraWidth, getPreferredSize().height);
-		setShape(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), styleManager.size.WINDOW_ROUNDING, styleManager.size.WINDOW_ROUNDING));
+		updateSize(styleManager);
 	}
 
 	public AbstractButton getSettingsButton() {
@@ -110,7 +124,7 @@ public class NinjabrainBotFrame extends ThemedFrame implements IDisposable {
 	}
 
 	public boolean isIdle() {
-		return mainTextArea.isIdle();
+		return compactPanel.isVisible() ? compactPanel.isIdle() : mainTextArea.isIdle();
 	}
 
 	private void setupSubscriptions(StyleManager styleManager, IDataState dataState) {
@@ -122,13 +136,19 @@ public class NinjabrainBotFrame extends ThemedFrame implements IDisposable {
 		disposeHandler.add(preferences.focusTextScale.whenModified().subscribeEDT(__ -> refreshLayout()));
 		disposeHandler.add(preferences.focusLayout.whenModified().subscribeEDT(__ -> refreshLayout()));
 		disposeHandler.add(preferences.view.whenModified().subscribeEDT(__ -> refreshLayout()));
+		disposeHandler.add(preferences.compactMode.whenModified().subscribeEDT(this::resizeForMode));
 		disposeHandler.add(preferences.alwaysOnTop.whenModified().subscribeEDT(this::setAlwaysOnTop));
 		disposeHandler.add(preferences.hotkeyMinimize.whenTriggered().subscribeEDT(__ -> toggleMinimized()));
 		// Components bounds changed
 		disposeHandler.add(mainTextArea.whenModified().subscribeEDT(__ -> updateSize(styleManager)));
 		disposeHandler.add(informationTextPanel.whenModified().subscribeEDT(__ -> updateSize(styleManager)));
 		disposeHandler.add(enderEyePanel.whenModified().subscribeEDT(__ -> updateSize(styleManager)));
-		disposeHandler.add(dataState.locked().subscribeEDT(b -> lockIcon.setVisible(b)));
+		disposeHandler.add(dataState.locked().subscribeEDT(locked -> {
+			lockIcon.setVisible(locked);
+			compactPanel.setLocked(locked);
+		}));
+		disposeHandler.add(dataState.calculatorResult().subscribeEDT(() -> updateCompactResult(dataState)));
+		disposeHandler.add(dataState.resultType().subscribeEDT(() -> updateCompactResult(dataState)));
 	}
 
 	private void createTitleBar(StyleManager styleManager, IDataState dataState, IUpdateChecker updateChecker) {
@@ -166,11 +186,87 @@ public class NinjabrainBotFrame extends ThemedFrame implements IDisposable {
 		informationTextPanel = new InformationListPanel(styleManager, informationMessageList);
 		add(informationTextPanel);
 		// "Throws" text + buttons
-		MainButtonPanel mainButtonPanel = new MainButtonPanel(styleManager, buttonInputHandler);
+		mainButtonPanel = new MainButtonPanel(styleManager, buttonInputHandler);
 		add(mainButtonPanel);
 		// Throw panels
 		enderEyePanel = new EnderEyePanel(styleManager, preferences, dataState, buttonInputHandler);
 		add(enderEyePanel);
+
+		compactPanel = new CompactTriangulationPanel(styleManager, preferences);
+		compactPanel.setLocked(dataState.locked().get());
+		updateCompactResult(dataState);
+		add(compactPanel);
+		installCompactControls();
+		compactPanel.addPropertyChangeListener("preferredSize", event -> {
+			if (compactPanel.isVisible())
+				updateSize(styleManager);
+		});
+		showCompactMode();
+	}
+
+	private void updateCompactResult(IDataState dataState) {
+		compactPanel.setResult(dataState.resultType().get() == ResultType.TRIANGULATION ? dataState.calculatorResult().get() : null);
+	}
+
+	private void showCompactMode() {
+		boolean compact = preferences.compactMode.get();
+		titlebarPanel.setVisible(!compact);
+		mainTextArea.setVisible(!compact);
+		informationTextPanel.setVisible(!compact);
+		mainButtonPanel.setVisible(!compact);
+		enderEyePanel.setVisible(!compact);
+		compactPanel.setVisible(compact);
+	}
+
+	private void resizeForMode() {
+		Rectangle monitor = compactPanel.isShowing() ? getGraphicsConfiguration().getBounds() : null;
+		Rectangle previousBounds = getBounds();
+		showCompactMode();
+		updateSize(styleManager);
+		if (!compactPanel.isVisible() && monitor != null && monitor.intersects(previousBounds)) {
+			// A compact overlay near the screen edge can leave the restored title buttons off screen.
+			int x = Math.max(monitor.x, Math.min(getX(), monitor.x + monitor.width - getWidth()));
+			int y = Math.max(monitor.y, Math.min(getY(), monitor.y + monitor.height - getHeight()));
+			setLocation(x, y);
+		}
+	}
+
+	private void installCompactControls() {
+		JPopupMenu menu = new JPopupMenu();
+		menu.setLightWeightPopupEnabled(false);
+		JMenuItem exitCompact = menu.add(I18n.get("compact.exit"));
+		exitCompact.addActionListener(event -> preferences.compactMode.set(false));
+		compactPanel.setComponentPopupMenu(menu);
+		compactPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "exitCompact");
+		compactPanel.getActionMap().put("exitCompact", new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				preferences.compactMode.set(false);
+			}
+		});
+
+		MouseAdapter dragWindow = new MouseAdapter() {
+			private Point offset;
+
+			@Override
+			public void mousePressed(MouseEvent event) {
+				if (SwingUtilities.isLeftMouseButton(event))
+					offset = event.getPoint();
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent event) {
+				offset = null;
+			}
+
+			@Override
+			public void mouseDragged(MouseEvent event) {
+				if (offset != null)
+					setLocation(event.getXOnScreen() - offset.x, event.getYOnScreen() - offset.y);
+			}
+		};
+		compactPanel.addMouseListener(dragWindow);
+		compactPanel.addMouseMotionListener(dragWindow);
 	}
 
 	@Override
@@ -262,9 +358,13 @@ public class NinjabrainBotFrame extends ThemedFrame implements IDisposable {
 	}
 
 	private void updateSize(StyleManager styleManager) {
-		int extraWidth = getExtraWidth(styleManager);
-		setSize(styleManager.size.WIDTH + extraWidth, getPreferredSize().height);
-		setShape(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), styleManager.size.WINDOW_ROUNDING, styleManager.size.WINDOW_ROUNDING));
+		if (compactPanel == null)
+			return;
+		boolean compact = compactPanel.isVisible();
+		Dimension size = compact ? compactPanel.getPreferredSize() : new Dimension(styleManager.size.WIDTH + getExtraWidth(styleManager), getPreferredSize().height);
+		int rounding = compact ? 4 : styleManager.size.WINDOW_ROUNDING;
+		setSize(size);
+		setShape(new RoundRectangle2D.Double(0, 0, size.width, size.height, rounding, rounding));
 	}
 
 	private void setAppIcon() {
@@ -306,6 +406,7 @@ public class NinjabrainBotFrame extends ThemedFrame implements IDisposable {
 		super.dispose();
 		mainTextArea.dispose();
 		enderEyePanel.dispose();
+		compactPanel.dispose();
 	}
 
 }

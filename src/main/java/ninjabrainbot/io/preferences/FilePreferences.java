@@ -33,7 +33,7 @@ public class FilePreferences implements IPreferenceSource {
 	private static final java.util.List<String> NOT_INHERITED = java.util.Arrays.asList(
 			"theme", "custom_themes", "custom_themes_names",
 			"translucent", "blurred_background",
-			"view", "focus_layout", "focus_text_scale", "show_throw_coordinates");
+			"view", "focus_layout", "focus_text_scale", "show_throw_coordinates", "compact_mode");
 
 	private final Path file;
 	private final Properties properties = new Properties();

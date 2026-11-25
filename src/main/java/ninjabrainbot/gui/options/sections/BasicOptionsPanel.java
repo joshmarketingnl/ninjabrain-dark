@@ -34,6 +34,7 @@ public class BasicOptionsPanel extends JPanel {
 		if (activeInstanceProvider.supportsReadingActiveMinecraftWorld())
 			column1.add(new CheckboxPanel(styleManager, I18n.get("settings.auto_reset_when_world_is_reset"), preferences.autoResetWhenChangingInstance));
 		column1.add(new CheckboxPanel(styleManager, I18n.get("settings.always_on_top"), preferences.alwaysOnTop));
+		column1.add(new CheckboxPanel(styleManager, I18n.get("settings.compact_mode"), preferences.compactMode));
 		column1.add(new CheckboxPanel(styleManager, I18n.get("settings.translucent_window"), preferences.translucent));
 		column1.add(new CheckboxPanel(styleManager, I18n.get("settings.blurred_background"), preferences.blurredBackground));
 		column1.add(new CheckboxPanel(styleManager, I18n.get("settings.show_throw_coordinates"), preferences.showThrowCoordinates));

@@ -48,6 +48,7 @@ public class NinjabrainBotPreferences {
 	public final BooleanPreference translucent;
 	public final BooleanPreference blurredBackground;
 	public final BooleanPreference showThrowCoordinates;
+	public final BooleanPreference compactMode;
 	public final FloatPreference windowOpacity;
 	public final FloatPreference focusTextScale;
 	public final MultipleChoicePreference<FocusLayoutType> focusLayout;
@@ -123,6 +124,7 @@ public class NinjabrainBotPreferences {
 		translucent = new BooleanPreference("translucent", false, source);
 		blurredBackground = new BooleanPreference("blurred_background", false, source);
 		showThrowCoordinates = new BooleanPreference("show_throw_coordinates", false, source);
+		compactMode = new BooleanPreference("compact_mode", false, source);
 		windowOpacity = new FloatPreference("window_opacity", 75f, 20f, 100f, source);
 		focusTextScale = new FloatPreference("focus_text_scale", 190f, 100f, 300f, source);
 		focusLayout = new MultipleChoicePreference<>("focus_layout", FocusLayoutType.GRID, new int[] { 0, 1, 2 }, new FocusLayoutType[] { FocusLayoutType.ROW, FocusLayoutType.GRID, FocusLayoutType.STACKED }, source);

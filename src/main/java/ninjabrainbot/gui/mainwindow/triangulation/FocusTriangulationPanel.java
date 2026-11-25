@@ -1,10 +1,8 @@
 package ninjabrainbot.gui.mainwindow.triangulation;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.util.List;
-import java.util.Locale;
 
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
@@ -23,7 +21,6 @@ import ninjabrainbot.io.preferences.NinjabrainBotPreferences;
 import ninjabrainbot.io.preferences.enums.FocusLayoutType;
 import ninjabrainbot.io.preferences.enums.StrongholdDisplayType;
 import ninjabrainbot.model.datastate.calculator.ICalculatorResult;
-import ninjabrainbot.model.datastate.stronghold.Chunk;
 import ninjabrainbot.model.datastate.stronghold.ChunkPrediction;
 import ninjabrainbot.util.I18n;
 
@@ -206,10 +203,10 @@ public class FocusTriangulationPanel extends ThemedPanel implements IDisposable 
 	}
 
 	private void setText(ChunkPrediction prediction) {
-		location.setText(formatCoordinates(prediction.chunk));
+		location.setText(ChunkCoordinates.format(prediction.chunk, preferences, styleManager.currentTheme));
 		certainty.setText(prediction.formatCertainty(), (float) prediction.chunk.weight);
 		distance.setText(prediction.formatDistanceInPlayersDimension());
-		nether.setText(formatCoordinates(prediction.xInNetherForDisplay(), prediction.zInNetherForDisplay()));
+		nether.setText(ChunkCoordinates.format(prediction.xInNetherForDisplay(), prediction.zInNetherForDisplay(), preferences, styleManager.currentTheme));
 		angle.setText(prediction.formatTravelAngle(false));
 		angle.setColoredText(prediction.formatTravelAngleDiff(), prediction.getTravelAngleDiffColor());
 	}
@@ -272,31 +269,6 @@ public class FocusTriangulationPanel extends ThemedPanel implements IDisposable 
 				// location + certainty + distance + nether + angle, by the same weights as the row.
 				return Math.round(coordinate * (2f + 1f + 1f + 1.8f + 2.5f) / 2f) + 6 * padding;
 		}
-	}
-
-	private String formatCoordinates(Chunk chunk) {
-		switch (preferences.strongholdDisplayType.get()) {
-			case FOURFOUR:
-				return formatCoordinates(chunk.fourFourX(), chunk.fourFourZ());
-			case EIGHTEIGHT:
-				return formatCoordinates(chunk.eightEightX(), chunk.eightEightZ());
-			default:
-				return formatCoordinates(chunk.x, chunk.z);
-		}
-	}
-
-	private String formatCoordinates(int x, int z) {
-		if (!preferences.colorCodeNegativeCoords.get())
-			return String.format(Locale.US, "(%d, %d)", x, z);
-		Color negative = styleManager.currentTheme.COLOR_NEGATIVE.color();
-		Color normal = styleManager.currentTheme.TEXT_COLOR_SLIGHTLY_WEAK.color();
-		String xColor = hex(x < 0 ? negative : normal);
-		String zColor = hex(z < 0 ? negative : normal);
-		return String.format(Locale.US, "<html>(<font color='%s'>%d</font>, <font color='%s'>%d</font>)</html>", xColor, x, zColor, z);
-	}
-
-	private static String hex(Color c) {
-		return String.format("#%02X%02X%02X", c.getRed(), c.getGreen(), c.getBlue());
 	}
 
 	@Override

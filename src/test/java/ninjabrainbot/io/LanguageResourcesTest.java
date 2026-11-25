@@ -1,6 +1,7 @@
 package ninjabrainbot.io;
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -15,10 +16,9 @@ import org.junit.jupiter.api.Test;
 class LanguageResourcesTest {
 
 	@Test
-	void allLanguagesAreRegistered() {
+	void allLanguagesAreRegistered() throws URISyntaxException {
 		URL url = Main.class.getResource("/lang");
-		String path = Objects.requireNonNull(url).getPath();
-		File[] languageFiles = new File(path).listFiles();
+		File[] languageFiles = new File(Objects.requireNonNull(url).toURI()).listFiles();
 		List<String> expectedLanguageFileNames = Arrays
 				.stream(Objects.requireNonNull(languageFiles))
 				.map(File::getName)

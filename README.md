@@ -12,7 +12,19 @@ A personal fork of [Ninjabrain Bot](https://github.com/Ninjabrain1/Ninjabrain-Bo
 - Fix: a freshly started app no longer reads the F3+C already on the clipboard as the first throw.
 - Settings live in `%APPDATA%\Ninjabrain<Edition>\settings.properties` instead of `java.util.prefs`; on first start they are copied from the original app's settings.
 
-Build with `mvn package`. Everything below is the original README.
+Build with `mvn package`. To also create the runnable jar, use `mvn package assembly:single`.
+
+## Compact mode
+
+Turn on **Settings → Basic → Compact mode** for a small Minecraft overlay with up to five stronghold candidates. The angle turns green within 10° of the target, and a small lock appears when the calculator is frozen. Drag the panel to position it. Press **Esc** in the focused window or right-click and choose **Exit Compact mode** to return to your previous view. Dark and Light save the choice separately.
+
+If you use the OBS image overlay, the same image file follows the selected mode and your OBS auto-hide settings.
+
+![Ninjabrain Dark in Compact mode with five candidates](docs/compact-mode/compact-5.png)
+
+[Compare with the normal stacked Dark view](docs/compact-mode/dark-stacked.png).
+
+Everything below is the original README.
 
 ---
 

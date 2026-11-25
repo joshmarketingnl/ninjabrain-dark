@@ -6,6 +6,7 @@ import java.awt.FlowLayout;
 
 import javax.swing.Box;
 
+import ninjabrainbot.event.Subscription;
 import ninjabrainbot.gui.buttons.WikiButton;
 import ninjabrainbot.gui.components.labels.ThemedLabel;
 import ninjabrainbot.gui.components.panels.ThemedPanel;
@@ -20,6 +21,7 @@ public class CheckboxPanel extends ThemedPanel {
 	public final ThemedLabel descLabel;
 	CustomCheckbox checkbox;
 	final BooleanPreference preference;
+	private Subscription preferenceSubscription;
 
 	WrappedColor disabledCol;
 
@@ -49,18 +51,30 @@ public class CheckboxPanel extends ThemedPanel {
 				return disabledCol.color();
 			}
 		};
-		checkbox = new CustomCheckbox(preference.get()) {
-			@Override
-			public void onChanged(boolean ticked) {
-				preference.set(ticked);
-			}
-		};
+		checkbox = new CustomCheckbox(preference.get());
+		checkbox.addActionListener(event -> preference.set(checkbox.isSelected()));
 		add(checkbox);
 		add(Box.createHorizontalStrut(OptionsFrame.PADDING));
 		add(descLabel);
 		setOpaque(true);
 
 		disabledCol = styleManager.currentTheme.TEXT_COLOR_WEAK;
+	}
+
+	@Override
+	public void addNotify() {
+		super.addNotify();
+		preferenceSubscription = preference.whenModified().subscribeEDT(() -> checkbox.setSelected(preference.get()));
+		checkbox.setSelected(preference.get());
+	}
+
+	@Override
+	public void removeNotify() {
+		if (preferenceSubscription != null) {
+			preferenceSubscription.dispose();
+			preferenceSubscription = null;
+		}
+		super.removeNotify();
 	}
 
 	public CheckboxPanel withWikiButton(WikiButton wikiButton) {

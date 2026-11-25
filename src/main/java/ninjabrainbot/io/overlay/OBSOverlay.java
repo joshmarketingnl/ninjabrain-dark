@@ -1,5 +1,6 @@
 package ninjabrainbot.io.overlay;
 
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 import javax.swing.SwingUtilities;
@@ -70,6 +71,8 @@ public class OBSOverlay implements IDisposable {
 		disposeHandler.add(preferences.informationMismeasureEnabled.whenModified().subscribeEDT(this::markShouldUpdate));
 		disposeHandler.add(preferences.informationPortalLinkingEnabled.whenModified().subscribeEDT(this::markShouldUpdate));
 		disposeHandler.add(preferences.view.whenModified().subscribeEDT(this::markShouldUpdate));
+		disposeHandler.add(preferences.compactMode.whenModified().subscribeEDT(this::markShouldUpdate));
+		disposeHandler.add(preferences.colorCodeNegativeCoords.whenModified().subscribeEDT(this::markShouldUpdate));
 		disposeHandler.add(preferences.theme.whenModified().subscribeEDT(this::markShouldUpdate));
 		disposeHandler.add(preferences.size.whenModified().subscribeEDT(this::markShouldUpdate));
 	}
@@ -120,11 +123,13 @@ public class OBSOverlay implements IDisposable {
 			BufferedImage img = new BufferedImage(ninjabrainBotFrame.getWidth(), ninjabrainBotFrame.getHeight(), BufferedImage.TYPE_INT_ARGB);
 			boolean hideBecauseLocked = preferences.overlayHideWhenLocked.get() && calculatorLocked.get();
 			if (!ninjabrainBotFrame.isIdle() && !hideBecauseLocked) {
+				Graphics2D graphics = img.createGraphics();
 				Translucency.suspend(true);
 				try {
-					ninjabrainBotFrame.paint(img.createGraphics());
+					ninjabrainBotFrame.paint(graphics);
 				} finally {
 					Translucency.suspend(false);
+					graphics.dispose();
 				}
 				resetClearTimer();
 			}
